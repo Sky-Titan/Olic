@@ -1,5 +1,6 @@
 package com.example.vacancyclassroom;
 
+import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -15,7 +16,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -276,6 +283,63 @@ public class MainActivity extends AppCompatActivity {
         url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1B07&sub=1B&search_open_yr_trm=20191");
         //생활과학대학-아동학부 아동가족학전공
         url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1B0701&sub=1B&search_open_yr_trm=20191");
+        //생활과학대학-아동학부 아동학전공
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1B0702&sub=1B&search_open_yr_trm=20191");
+        //생활과학대학-의류학과
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1B03&sub=1B&search_open_yr_trm=20191");
+
+        //자율전공부-인문사회자율전공
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1E01&sub=1E&search_open_yr_trm=20191");
+        //자율전공부-자연과학자율전공
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1E02&sub=1E&search_open_yr_trm=20191");
+        //자율전공부-자율전공부
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1E&sub=1E&search_open_yr_trm=20191");
+
+        //간호대학-간호학과
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1C01&sub=1C&search_open_yr_trm=20191");
+
+        //IT대학-건설IT전공
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O07&sub=1O&search_open_yr_trm=20191");
+        //IT대학-미디어아트전공
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O09&sub=1O&search_open_yr_trm=20191");
+        //IT대학-빅데이터전공
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O06&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전기공학과
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O03&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전자공학부
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O01&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전자공학부A
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O01001&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전자공학부B
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O01002&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전자공학부C
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O01003&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전자공학부D
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O01004&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전자공학부E
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O01005&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전자공학부F
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O01006&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전자공학부H
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O01007&sub=1O&search_open_yr_trm=20191");
+        //IT대학-전자공학부 모바일공학전공
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O0101&sub=1O&search_open_yr_trm=20191");
+        //IT대학-컴퓨터학부
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O02&sub=1O&search_open_yr_trm=20191");
+        //IT대학-컴퓨터학부 글로벌소프트웨어융합전공
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O0204&sub=1O&search_open_yr_trm=20191");
+        //IT대학-핀테크전공
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O08&sub=1O&search_open_yr_trm=20191");
+
+        //글로벌인재학부-글로벌인재학부
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1P03&sub=1P&search_open_yr_trm=20191");
+
+        //약학대학-약학과
+        url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1Q01&sub=1P&search_open_yr_trm=20191");
+
+
+
+
 
     }
     public void loadDB(){
@@ -284,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
                 SQLiteDatabase.CREATE_IF_NECESSARY,
                 null);
 
-        db.execSQL("DROP TABLE IF EXISTS lecture;");
+   //     db.execSQL("DROP TABLE IF EXISTS lecture;");
         db.execSQL("CREATE TABLE IF NOT EXISTS lecture"
                 +"(code TEXT PRIMARY KEY,title TEXT,classroom TEXT,time TEXT);");
     /*    Cursor c= db.rawQuery("SELECT * FROM lecture",null);
@@ -303,24 +367,122 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        loadDB();
-
+      //  add_url(); //url들 배열에 추가
+    //    loadDB();//db 불러오기
+     //   sending();//mysql로 보내기
         textviewHtmlDocument = (TextView)findViewById(R.id.textView);
         textviewHtmlDocument.setMovementMethod(new ScrollingMovementMethod()); //스크롤 가능한 텍스트뷰로 만들기
 
         Button htmlTitleButton = (Button)findViewById(R.id.button);
-        htmlTitleButton.setOnClickListener(new View.OnClickListener() {
+    /*    htmlTitleButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) { //파싱시작
                 System.out.println( (cnt+1) +"번째 파싱");
                 JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
                 jsoupAsyncTask.execute();
                 cnt++;
             }
-        });
+        });*/
+    }
+    public void sending(){
+
+        InsertData task = new InsertData();
+
+        task.execute("http://121.182.35.52/vacancyclassroom/insert_lecture.php");
     }
 
+
+
+    class InsertData extends AsyncTask<String, Void, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            StringBuilder sb=new StringBuilder();;
+
+
+            String serverURL = (String)params[0];
+
+            SQLiteDatabase db = openOrCreateDatabase(
+                    "lecture_list.db",
+                    SQLiteDatabase.CREATE_IF_NECESSARY,
+                    null);
+
+
+            Cursor cursor=db.rawQuery("SELECT * FROM lecture",null);
+
+            int i=0;
+                try {
+                    while(cursor.moveToNext()) {
+                        i++;
+                        System.out.println(i+"번째 sql 전송");
+                        String postParameters = "code=" + cursor.getString(0) + "&title=" + cursor.getString(1) + "&classroom=" + cursor.getString(2) + "&time=" + cursor.getString(3);
+                        URL url = new URL(serverURL);
+                        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                        httpURLConnection.setReadTimeout(5000);
+                        httpURLConnection.setConnectTimeout(5000);
+                        httpURLConnection.setRequestMethod("POST");
+                        httpURLConnection.connect();
+
+                        OutputStream outputStream = httpURLConnection.getOutputStream();
+                        outputStream.write(postParameters.getBytes("euckr"));
+                        outputStream.flush();
+                        outputStream.close();
+
+
+                        int responseStatusCode = httpURLConnection.getResponseCode();
+
+                        InputStream inputStream;
+                        if (responseStatusCode == HttpURLConnection.HTTP_OK) {
+                            inputStream = httpURLConnection.getInputStream();
+                        } else {
+                            inputStream = httpURLConnection.getErrorStream();
+                        }
+
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                        sb = new StringBuilder();
+                        String line = null;
+
+                        while ((line = bufferedReader.readLine()) != null) {
+                            sb.append(line);
+                        }
+
+
+                        bufferedReader.close();
+
+                    }
+                    if(db!=null){
+                        db.close();
+                    }
+                    return sb.toString();
+
+
+                } catch (Exception e) {
+
+                    return new String("Error: " + e.getMessage());
+                }
+
+        }
+    }
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -339,32 +501,33 @@ public class MainActivity extends AppCompatActivity {
 
                 //Cursor c= db.rawQuery("SELECT * FROM lecture",null);
 
-                Document doc = Jsoup.connect(htmlPageUrl).get();
+                for(int i=0;i<url_List.size();i++) {//url 리스트 만큼 반복
+                    Document doc = Jsoup.connect(url_List.get(i)).get();
+                    System.out.println( (i+1) +"번째 페이지");
+
+                    //테스트1
+                    Elements titles = doc.select("td.th4");//과목코드
+                    Elements titles2 = doc.select("td.th5");//과목이름
+                    Elements titles3 = doc.select("td.th11");//강의실
+                    Elements titles4 = doc.select("td.th17");//강의시간
 
 
-                //테스트1
-                Elements titles= doc.select("td.th4");//과목코드
-                Elements titles2= doc.select("td.th5");//과목이름
-                Elements titles3= doc.select("td.th11");//강의실
-                Elements titles4= doc.select("td.th17");//강의시간
+                    System.out.println("-------------------------------------------------------------");
+                    for (int j = 0; j < titles.size(); j++) {
+                        //System.out.println("title: " + e.text());
+                        //htmlContentInStringFormat += e.text().trim() + "\n";
+                        db.execSQL("REPLACE INTO lecture (code,title,classroom,time) VALUES('" + titles.get(j).text().trim() + "','" + titles2.get(j).text().trim()
+                                + "','" + titles3.get(j).text().trim() + "','" + titles4.get(j).text().trim() + "')");
+                    }
 
+                    System.out.println("-------------------------------------------------------------");
 
-                System.out.println("-------------------------------------------------------------");
-                for(int i=0;i<titles.size();i++){
-                    //System.out.println("title: " + e.text());
-                    //htmlContentInStringFormat += e.text().trim() + "\n";
-                    db.execSQL("REPLACE INTO lecture (code,title,classroom,time) VALUES('"+titles.get(i).text().trim()+"','"+titles2.get(i).text().trim()
-                            +"','"+titles3.get(i).text().trim()+"','"+titles4.get(i).text().trim()+"')");
+                    Cursor c = db.rawQuery("SELECT * FROM lecture", null);
+                    while (c.moveToNext()) {
+                        htmlContentInStringFormat += c.getString(0) + " " + c.getString(1) + " " +
+                                c.getString(2) + " " + c.getString(3) + "\n";
+                    }
                 }
-
-                System.out.println("-------------------------------------------------------------");
-
-                Cursor c= db.rawQuery("SELECT * FROM lecture",null);
-                while(c.moveToNext()){
-                    htmlContentInStringFormat+=c.getString(0)+" "+c.getString(1)+" "+
-                    c.getString(2)+" "+c.getString(3)+"\n";
-                }
-
                 if(db!=null){
                     db.close();
                 }
