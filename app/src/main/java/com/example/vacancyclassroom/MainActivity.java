@@ -11,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,11 +31,19 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<String> url_List=new ArrayList<>();
+    private ArrayList<Lecture> mysql_List=new ArrayList<>();
     private String htmlPageUrl = "http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1O07&sub=1O&search_open_yr_trm=20191"; //파싱할 홈페이지의 URL주소
     private TextView textviewHtmlDocument;
     private String htmlContentInStringFormat="";
-
+    String myJSON;
+    JSONArray lectures = null;
     int cnt=0;
+
+    private static final String TAG_RESULTS = "result";
+    private static final String TAG_CLASSROOM = "classroom";
+    private static final String TAG_CODE = "code";
+    private static final String TAG_TITLE = "title";
+    private static final String TAG_TIME = "time";
 
     public void add_url(){
         //인문대-고고인류학과
@@ -369,7 +380,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
       //  add_url(); //url들 배열에 추가
     //    loadDB();//db 불러오기
-     //   sending();//mysql로 보내기
+      //  sending();//mysql로 보내기
+       // compare();
+
+
         textviewHtmlDocument = (TextView)findViewById(R.id.textView);
         textviewHtmlDocument.setMovementMethod(new ScrollingMovementMethod()); //스크롤 가능한 텍스트뷰로 만들기
 
@@ -387,12 +401,83 @@ public class MainActivity extends AppCompatActivity {
     public void sending(){
 
         InsertData task = new InsertData();
-
-        task.execute("http://121.182.35.52/vacancyclassroom/insert_lecture.php");
+        //121.182.35.52
+        task.execute("http://ec2-54-180-150-103.ap-northeast-2.compute.amazonaws.com/insert_lecture.php");
+        //http://ec2-54-180-150-103.ap-northeast-2.compute.amazonaws.com/insert_lecture.php
     }
 
+    public void compare(){
+
+        getData("http://121.182.35.52/vacancyclassroom/select_lecture.php");
+    }
+    public void getData(String url){
+        class GetDataJSON extends AsyncTask<String, Void, String> {
+            @Override
+            protected String doInBackground(String... params){
+                String uri = params[0];
+                BufferedReader bufferedReader = null;
+                try{
+                    URL url = new URL(uri);
+                    HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                    StringBuilder sb = new StringBuilder();
+
+                    bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+                    String json;
+                    while((json = bufferedReader.readLine()) != null){
+                        sb.append(json + "\n");
+                    }
+
+                    return sb.toString().trim();
+                }catch (Exception e){
+                    return null;
+                }
+            }
+            @Override
+            protected void onPostExecute(String result){
+                myJSON = result;
+                showList();
+                SQLiteDatabase db = openOrCreateDatabase(
+                        "lecture_list.db",
+                        SQLiteDatabase.CREATE_IF_NECESSARY,
+                        null);
 
 
+                Cursor cursor=db.rawQuery("SELECT * FROM lecture",null);
+                int i=0;
+                while(cursor.moveToNext()){
+                    String code=cursor.getString(0);
+                    if(!code.equals(mysql_List.get(i).getCode()))
+                    {
+                        System.out.println(i+"번째 "+code+" "+cursor.getString(1));
+                    }
+                    i++;
+                }
+                if(db!=null)
+                    db.close();
+            }
+        }
+        GetDataJSON g = new GetDataJSON();
+        g.execute(url);
+    }
+    protected void showList(){
+        try{
+            JSONObject jsonObj = new JSONObject(myJSON);
+            lectures = jsonObj.getJSONArray(TAG_RESULTS);
+
+
+            for(int i =0;i< lectures.length();i++){
+                JSONObject c = lectures.getJSONObject(i);
+                String code = c.getString(TAG_CODE);
+                String title = c.getString(TAG_TITLE);
+                String classroom = c.getString(TAG_CLASSROOM);
+                String time = c.getString(TAG_TIME);
+                mysql_List.add(new Lecture(code,title,classroom,time));
+            }
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
     class InsertData extends AsyncTask<String, Void, String> {
         ProgressDialog progressDialog;
 
@@ -425,24 +510,32 @@ public class MainActivity extends AppCompatActivity {
 
 
             Cursor cursor=db.rawQuery("SELECT * FROM lecture",null);
-
+           // cursor.moveToPosition(2019);
             int i=0;
+            int j=0;
                 try {
+
                     while(cursor.moveToNext()) {
+                        if(i%8000==0)
+                        {
+                            Thread.sleep(5000);
+                        }
                         i++;
-                        System.out.println(i+"번째 sql 전송");
+                        if(cursor.getString(0).equals("") || cursor.getString(1).equals("") || cursor.getString(2).equals("") || cursor.getString(3).equals(""))
+                                j++;
+                        System.out.println(i+"번째 sql 전송 "+cursor.getString(0)+" "+cursor.getString(1)+" "+cursor.getString(3));
                         String postParameters = "code=" + cursor.getString(0) + "&title=" + cursor.getString(1) + "&classroom=" + cursor.getString(2) + "&time=" + cursor.getString(3);
                         URL url = new URL(serverURL);
                         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
 
-                        httpURLConnection.setReadTimeout(5000);
-                        httpURLConnection.setConnectTimeout(5000);
+                        httpURLConnection.setReadTimeout(30000);
+                        httpURLConnection.setConnectTimeout(30000);
                         httpURLConnection.setRequestMethod("POST");
                         httpURLConnection.connect();
 
                         OutputStream outputStream = httpURLConnection.getOutputStream();
-                        outputStream.write(postParameters.getBytes("euckr"));
+                        outputStream.write(postParameters.getBytes("UTF-8"));
                         outputStream.flush();
                         outputStream.close();
 
@@ -466,10 +559,11 @@ public class MainActivity extends AppCompatActivity {
                             sb.append(line);
                         }
 
-
+                        Thread.sleep(100);
                         bufferedReader.close();
 
                     }
+                    System.out.println(j);
                     if(db!=null){
                         db.close();
                     }
@@ -477,7 +571,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 } catch (Exception e) {
-
+                    System.out.println("-------------------------------------------------"+e.getMessage());
                     return new String("Error: " + e.getMessage());
                 }
 
