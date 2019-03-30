@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.vacancyclassroom.R;
+import com.google.android.gms.ads.MobileAds;
 import com.jun.vacancyclassroom.adapter.ViewPagerAdapter;
 
 import org.json.JSONArray;
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
 
+        MobileAds.initialize(this, "ca-app-pub-7245602797811817~6821353940");
         SharedPreferences sf = getSharedPreferences("sFile",MODE_PRIVATE);
         String text = sf.getString("first","");//첫 사용인지 구분
         if(text.equals(""))//첫사용일시
