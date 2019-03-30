@@ -16,6 +16,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.vacancyclassroom.R;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.adapter.SearchAdapter;
 import com.jun.vacancyclassroom.item.SearchItem;
 
@@ -29,7 +31,7 @@ public class FragmentA extends Fragment {
 
     SearchAdapter adapter;
     ListView listView;
-
+    private AdView mAdView;
     MyDBHelper helper;
 
     View view;
@@ -83,6 +85,12 @@ public class FragmentA extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_a,container,false);
+
+        mAdView = (AdView) view.findViewById(R.id.adView1);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        mAdView.loadAd(adRequest);
 
         search_edittext=(EditText)view.findViewById(R.id.search_classroom);//검색
         search_edittext.addTextChangedListener(new TextWatcher() {

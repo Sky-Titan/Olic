@@ -14,6 +14,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.vacancyclassroom.R;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.adapter.BookMarkAdapter;
 import com.jun.vacancyclassroom.item.BookMarkItem;
 
@@ -32,7 +34,7 @@ public class FragmentB extends Fragment {
     ListView listView;
     ArrayList<String> checkedlist=new ArrayList<>();
     MyDBHelper helper;
-
+    private AdView mAdView;
     View view;
     public FragmentB() {
         // Required empty public constructor
@@ -50,7 +52,11 @@ public class FragmentB extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_b,container,false);
-
+        mAdView = (AdView) view.findViewById(R.id.adView2);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        mAdView.loadAd(adRequest);
         adapter=new BookMarkAdapter();
         listView=(ListView)view.findViewById(R.id.searchlist_b);
         listView.setAdapter(adapter);
