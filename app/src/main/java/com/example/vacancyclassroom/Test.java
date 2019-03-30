@@ -384,7 +384,7 @@ public class Test extends AppCompatActivity {
 //        textviewHtmlDocument = (TextView)findViewById(R.id.textView);
         //       textviewHtmlDocument.setMovementMethod(new ScrollingMovementMethod()); //스크롤 가능한 텍스트뷰로 만들기
 
-        Button htmlTitleButton = (Button)findViewById(R.id.button);
+
     /*    htmlTitleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { //파싱시작
