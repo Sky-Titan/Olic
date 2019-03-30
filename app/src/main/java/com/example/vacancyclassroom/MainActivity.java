@@ -718,18 +718,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void sending(){
-
-        InsertData task = new InsertData();
-        //121.182.35.52
-        task.execute("http://ec2-54-180-150-103.ap-northeast-2.compute.amazonaws.com/insert_lecture.php");
-        //http://ec2-54-180-150-103.ap-northeast-2.compute.amazonaws.com/insert_lecture.php
-    }
-
-    public void compare(){
-
-        getData("http://121.182.35.52/vacancyclassroom/select_lecture.php");
-    }
     public void getData(String url){
         class GetDataJSON extends AsyncTask<String, Void, String> {
             @Override
