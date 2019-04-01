@@ -155,10 +155,9 @@ public class FragmentB extends Fragment {
         TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
         Calendar now = Calendar.getInstance(timeZone);
 
-
         String day1=dayToKorean(now.get(Calendar.DAY_OF_WEEK));
 
-        String hour=String.valueOf(now.get(Calendar.HOUR));
+        String hour=String.valueOf(now.get(Calendar.HOUR_OF_DAY));
 
         String minute=String.valueOf(now.get(Calendar.MINUTE));
         System.out.println(day1+hour+":"+minute);
