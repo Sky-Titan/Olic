@@ -46,39 +46,8 @@ public class FragmentA extends Fragment {
     public void onResume(){
         super.onResume();
 
-        boolean isResume=false;
+        getChecked();
 
-        helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
-        db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (classroom TEXT)");
-        Cursor cursor=db.rawQuery("SELECT * FROM bookmarklist ;",null);
-
-        if(cursor.getCount()==old_checked.size())//둘이 사이즈 같을때만비교
-        {
-            cursor.close();
-            for (int i = 0; i < old_checked.size(); i++)//그전에 북마킹 되어있던것과 비교
-            {
-                cursor = db.rawQuery("SELECT * FROM bookmarklist WHERE classroom ='" + old_checked.get(i) + "';", null);
-                if (cursor.getCount() == 0) {
-                    isResume = true;
-                    cursor.close();
-                    break;
-                }
-                cursor.close();
-            }
-        }
-        else {
-            isResume=true;
-        }
-        if (db!=null)
-            db.close();
-
-        if(isResume==true) {//resume한다
-            adapter = new SearchAdapter();
-            listView.setAdapter(adapter);
-            loadList("");
-            getChecked();
-        }
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
