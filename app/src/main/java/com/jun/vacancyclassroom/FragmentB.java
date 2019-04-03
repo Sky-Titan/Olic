@@ -210,11 +210,14 @@ public class FragmentB extends Fragment {
                     if (day.equals(day_today)) {//요일이 같으면 그다음 단계
                         if (before_hour_num < hour_today_num && hour_today_num < after_hour_num)//현재시간이 사이에 있다면
                         {
+                            isPossible = false;
                             //이용불가
                         } else if (before_hour_num > hour_today_num && hour_today_num > after_hour_num)//현재시간이 밖에 있다면
                         {
                             //이용가능
-                        } else if (before_hour_num == hour_today_num)//before 시간과 같은 경우
+                            isPossible = true;
+                        }
+                        else if (before_hour_num == hour_today_num)//before 시간과 같은 경우
                         {
                             //before 분과 비교
                             if (before_minute_num <= minute_today_num)//before minute보다 같거나 크면 이용불가
