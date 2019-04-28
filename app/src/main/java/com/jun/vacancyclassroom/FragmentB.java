@@ -1,6 +1,7 @@
 package com.jun.vacancyclassroom;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -36,6 +37,7 @@ public class FragmentB extends Fragment {
     MyDBHelper helper;
     private AdView mAdView;
     View view;
+
     public FragmentB() {
         // Required empty public constructor
     }
@@ -52,6 +54,8 @@ public class FragmentB extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_b,container,false);
+
+        System.out.println("Fragment B 출력");
         mAdView = (AdView) view.findViewById(R.id.adView2);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
@@ -66,27 +70,9 @@ public class FragmentB extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 BookMarkItem item=(BookMarkItem)adapter.getItem(i);
 
-                helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
-                SQLiteDatabase db=helper.getReadableDatabase();
-                db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (classroom TEXT)");
-                Cursor cursor=db.rawQuery("SELECT * FROM bookmarklist WHERE classroom ='"+item.getClassroom()+"';",null);
-
-                //만약 즐겨찾기 db에 없다면 추가
-                if(cursor.getCount()==0)
-                {
-                    db.execSQL("INSERT INTO bookmarklist (classroom) VALUES ('"+item.getClassroom()+"');");
-                    listView.setItemChecked(i,true);
-                    Toast.makeText(getContext(),"즐겨찾기에 추가했습니다.",Toast.LENGTH_SHORT).show();
-                }
-                else {//즐겨찾기에 있다면 삭제
-                    db.execSQL("DELETE FROM bookmarklist WHERE classroom = '"+item.getClassroom()+"';");
-                    listView.setItemChecked(i,false);
-                    onResume();
-                    Toast.makeText(getContext(),"즐겨찾기가 해제됐습니다.",Toast.LENGTH_SHORT).show();
-                }
-                cursor.close();
-                if(db!=null)
-                    db.close();
+                Intent intent = new Intent(getContext(),TimeTableActivity.class);
+                intent.putExtra("classroom",item.getClassroom());
+                startActivity(intent);
             }
         });
 
@@ -139,6 +125,7 @@ public class FragmentB extends Fragment {
             db.close();
 
     }
+    //해당 교실이 현재 시간에 이용가능한지 판단
     public boolean classification(String classroom_name) {
 
         boolean isPossible = true;

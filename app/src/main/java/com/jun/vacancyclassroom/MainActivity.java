@@ -1,5 +1,6 @@
 package com.jun.vacancyclassroom;
 
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
+        setTitle(R.string.semester);//타이틀바 텍스트
             setContentView(R.layout.activity_main);
 
         MobileAds.initialize(this, "ca-app-pub-7245602797811817~6821353940");
@@ -163,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
 
         setupViewPager(mViewPager);
     }
+
+    //처음 접속시 db파일 에셋에서 불러옴
     public static void initialize(Context ctx) {
         File folder = new File(PACKAGE_DIR);
         folder.mkdirs();
@@ -192,33 +196,11 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         fragment_A = new FragmentA();
         fragment_B = new FragmentB();
+
         viewPagerAdapter.addFragment(fragment_A);
         viewPagerAdapter.addFragment(fragment_B);
+
         viewPager.setAdapter(viewPagerAdapter);
     }
-
-
-    public String dayToKorean(String day) {
-
-        if (day.equals("Mon"))
-            return "월";
-        else if (day.equals("Tue"))
-            return "화";
-        else if (day.equals("Wed"))
-            return "수";
-        else if (day.equals("Thu"))
-            return "목";
-        else if (day.equals("Fri"))
-            return "금";
-        else if (day.equals("Sat"))
-            return "토";
-        else if (day.equals("Sun"))
-            return "일";
-        else
-            return day;
-    }
-
-
-
 
 }

@@ -54,7 +54,7 @@ public class FragmentA extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_a,container,false);
-
+        System.out.println("Fragment A 출력");
         mAdView = (AdView) view.findViewById(R.id.adView1);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
