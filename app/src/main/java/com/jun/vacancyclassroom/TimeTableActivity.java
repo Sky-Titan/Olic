@@ -51,7 +51,7 @@ public class TimeTableActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         classroom = intent.getExtras().getString("classroom");
-
+        System.out.println("강의실 : "+classroom);
         //강의실 이름 설정
         classroom_textview = (TextView) findViewById(R.id.classroom_name_timetable);
         classroom_textview.setText(classroom);
@@ -191,18 +191,18 @@ public class TimeTableActivity extends AppCompatActivity {
                     }
 
                     String IDofSpanCell = dayToEnglish(day) + before_hour + before_minute;//span해야할 cell의 id
-                    System.out.println(IDofSpanCell);
-                    System.out.println("row : "+ row);
+                    System.out.println("Spancell id : "+IDofSpanCell);
                     TextView spanCell = (TextView) view.findViewWithTag(IDofSpanCell);//span cell
-                    System.out.println(spanCell.getId());
                     GridLayout.LayoutParams layoutParams = (GridLayout.LayoutParams)spanCell.getLayoutParams();
-                    System.out.println("column : "+dayToNum(day));
                     layoutParams.columnSpec = GridLayout.spec(dayToNum(day));
                     layoutParams.rowSpec = GridLayout.spec(row,result);//병합할 셀 수 정함
                     spanCell.setLayoutParams(layoutParams);//적용
                     layoutParams.setGravity(Gravity.FILL);//gravity 설정
                     spanCell.setLayoutParams(layoutParams);//다시 적용
-                    spanCell.setText("                    ");//빈 텍스트 적용
+
+                    spanCell.setText("     ");//빈 텍스트 적용
+                    /*TODO :기기마다 버그 발생할 확률 높음!!!!!! */
+
                     spanCell.setBackground(getResources().getDrawable(R.drawable.fill_cell));
                 }
 
@@ -258,7 +258,7 @@ public class TimeTableActivity extends AppCompatActivity {
         String hour=String.valueOf(now.get(Calendar.HOUR_OF_DAY));
 
         String minute=String.valueOf(now.get(Calendar.MINUTE));
-        System.out.println(day1+hour+":"+minute);
+        System.out.println("현재시각 : "+day1+hour+":"+minute);
 
         String day_today = day1;//현재요일
         String hour_today = hour;//현재시간

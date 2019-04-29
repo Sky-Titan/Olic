@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.jun.vacancyclassroom.TimeTableActivity"></activity>
+        <activity android:name="com.jun.vacancyclassroom.TimeTableActivity"
+            android:screenOrientation="portrait"></activity>
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -28,8 +29,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.jun.vacancyclassroom.Test" />
-        <activity android:name="com.jun.vacancyclassroom.MainActivity" />
+        <activity android:name="com.jun.vacancyclassroom.Test"
+            android:screenOrientation="portrait"/>
+        <activity android:name="com.jun.vacancyclassroom.MainActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
