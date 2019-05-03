@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     MenuItem prevMenuItem;
     FragmentA fragment_A;
     FragmentB fragment_B;
+    FragmentC fragment_C;
     static final int G_NOTIFY_NUM = 1;
     private NonSwipeViewPager mViewPager;
 
@@ -97,6 +98,10 @@ public class MainActivity extends AppCompatActivity {
                     fragment_B.onResume();
                     return true;
 
+                case R.id.navigation_buildingSearch:
+                    mViewPager.setCurrentItem(2);
+                    fragment_C.onResume();
+                    return true;
             }
 
             return false;
@@ -196,10 +201,10 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         fragment_A = new FragmentA();
         fragment_B = new FragmentB();
-
+        fragment_C = new FragmentC();
         viewPagerAdapter.addFragment(fragment_A);
         viewPagerAdapter.addFragment(fragment_B);
-
+        viewPagerAdapter.addFragment(fragment_C);
         viewPager.setAdapter(viewPagerAdapter);
     }
 

@@ -61,7 +61,8 @@ public class FragmentA extends Fragment {
                 .build();
         mAdView.loadAd(adRequest);
 
-        search_edittext=(EditText)view.findViewById(R.id.search_classroom);//검색
+        //검색
+        search_edittext=(EditText)view.findViewById(R.id.search_classroom);
         search_edittext.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -124,6 +125,7 @@ public class FragmentA extends Fragment {
         return view;
     }
 
+    //리스트뷰 생성
     public void loadList(String searching_word){
         helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
         SQLiteDatabase db=helper.getReadableDatabase();
@@ -141,8 +143,8 @@ public class FragmentA extends Fragment {
             while (c.moveToNext()) {
                 String classroom = c.getString(0);
                 String time = c.getString(1);
-                if(classroom.contains(searching_word.trim()))
-                adapter.addItem(classroom, time);
+                if(classroom.toUpperCase().contains(searching_word.trim()) || classroom.toLowerCase().contains(searching_word.trim()))//영어 대소문자 둘다 검사
+                    adapter.addItem(classroom, time);
             }
         }
         c.close();

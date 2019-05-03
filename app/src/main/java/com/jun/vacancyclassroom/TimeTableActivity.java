@@ -40,6 +40,7 @@ public class TimeTableActivity extends AppCompatActivity {
     Button bookmark;
     Button isPossibleButton;
 
+    Boolean isBookMarked;
     TextView classroom_textview;
     String classroom;
     @Override
@@ -63,16 +64,44 @@ public class TimeTableActivity extends AppCompatActivity {
                 .build();
         mAdView.loadAd(adRequest);
 
+
+        helper=new MyDBHelper(this,"lecture_list.db",null,1);
+        SQLiteDatabase db=helper.getReadableDatabase();
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (classroom TEXT)");
+        Cursor c = db.rawQuery("SELECT * FROM bookmarklist WHERE classroom ='"+classroom+"';", null);
+
         //즐겨찾기 해제
         bookmark = (Button)findViewById(R.id.bookmarkButton_timetable);
+        if(c.getCount()==0)
+        {
+            isBookMarked = false;
+            bookmark.setText("즐겨찾기 추가");
+        }
+        else
+        {
+            isBookMarked = true;
+            bookmark.setText("즐겨찾기 해제");
+        }
+        c.close();
+        if(db!=null)
+            db.close();
         bookmark.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
-                SQLiteDatabase db=helper.getReadableDatabase();
-                db.execSQL("DELETE FROM bookmarklist WHERE classroom = '"+classroom+"';");
-                Toast.makeText(getApplicationContext(),"즐겨찾기가 해제됐습니다.",Toast.LENGTH_SHORT).show();
 
+                helper = new MyDBHelper(getApplicationContext(), "lecture_list.db", null, 1);
+                SQLiteDatabase db = helper.getReadableDatabase();
+                if(isBookMarked == true) {
+
+                    db.execSQL("DELETE FROM bookmarklist WHERE classroom = '" + classroom + "';");
+                    Toast.makeText(getApplicationContext(), "즐겨찾기가 해제됐습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    db.execSQL("INSERT INTO bookmarklist (classroom) VALUES ('"+classroom+"');");
+                    Toast.makeText(getApplicationContext(), "즐겨찾기에 추가됐습니다.", Toast.LENGTH_SHORT).show();
+                }
                 if(db!=null)
                     db.close();
                 finish();
@@ -82,7 +111,7 @@ public class TimeTableActivity extends AppCompatActivity {
         isPossibleButton = (Button)findViewById(R.id.isPossibleButton_timetable);
         //즐겨찾기 목록 불러오기
         helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
+        db=helper.getReadableDatabase();
         db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (classroom TEXT)");
         Cursor cursor=db.rawQuery("SELECT * FROM bookmarklist;",null);
 
@@ -148,7 +177,8 @@ public class TimeTableActivity extends AppCompatActivity {
                 int after_hour_num = Integer.parseInt(after_hour);
                 int before_minute_num = Integer.parseInt(before_minute);
                 int after_minute_num = Integer.parseInt(after_minute);
-
+                if(day.equals("토") || day.equals("일"))
+                    continue;
 
                 //최소 시간 오전 9시00분
                 if(before_hour_num < 9)

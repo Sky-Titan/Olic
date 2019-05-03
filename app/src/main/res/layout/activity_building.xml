@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.jun.vacancyclassroom.BuildingActivity">
+
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        android:layout_gravity="center_horizontal"
+        ads:adUnitId="ca-app-pub-7245602797811817/4320875151">
+    </com.google.android.gms.ads.AdView>
+    <TextView
+        android:id="@+id/buildingName_buildingActivity"
+        android:text="빌딩 이름"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+    <ListView
+        android:id="@+id/classroomlist_buildingActivity"
+        android:choiceMode="multipleChoice"
+        android:layout_width="match_parent"
+        android:layout_weight="13"
+        android:layout_height="0dp"
+        ></ListView>
+</LinearLayout>

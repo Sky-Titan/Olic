@@ -16,5 +16,10 @@
         android:icon="@drawable/baseline_bookmarks_black_24"
         android:title="@string/title_dashboard" />
 
-
+    <item
+        android:id="@+id/navigation_buildingSearch"
+        app:showAsAction="always"
+        android:enabled="true"
+        android:icon="@drawable/baseline_place_black_48"
+        android:title="@string/title_building" />
 </menu>

@@ -1,23 +1,21 @@
 package com.jun.vacancyclassroom;
 
-
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.adapter.BookMarkAdapter;
+import com.jun.vacancyclassroom.adapter.BuildingSearchAdapter;
 import com.jun.vacancyclassroom.item.BookMarkItem;
 
 import java.util.ArrayList;
@@ -25,94 +23,73 @@ import java.util.Calendar;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
-public class FragmentB extends Fragment {
+public class BuildingActivity extends AppCompatActivity {
 
     BookMarkAdapter adapter;
     ListView listView;
-    ArrayList<String> checkedlist=new ArrayList<>();
-    MyDBHelper helper;
     private AdView mAdView;
-    View view;
+    MyDBHelper helper;
 
-    public FragmentB() {
-        // Required empty public constructor
-    }
-    @Override
-    public void onResume(){
-        super.onResume();
-        adapter=new BookMarkAdapter();
-        listView.setAdapter(adapter);
-        checkedlist=new ArrayList<String>();
-        loadList();
-    }
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        view=inflater.inflate(R.layout.fragment_b,container,false);
+    String buildingName;
+    TextView buildingName_textview;
 
-        System.out.println("Fragment B 출력");
-        mAdView = (AdView) view.findViewById(R.id.adView2);
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_building);
+
+        mAdView = (AdView) findViewById(R.id.adView5);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mAdView.loadAd(adRequest);
         adapter=new BookMarkAdapter();
-        listView=(ListView)view.findViewById(R.id.searchlist_b);
+        listView=(ListView)findViewById(R.id.classroomlist_buildingActivity);
         listView.setAdapter(adapter);
+
+        //인텐트 받아오고 건물 이름 지정
+        buildingName_textview = (TextView) findViewById(R.id.buildingName_buildingActivity);
+        Intent intent = getIntent();
+        buildingName = intent.getExtras().getString("buildingName");
+        buildingName_textview.setText(buildingName);
+
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 BookMarkItem item=(BookMarkItem)adapter.getItem(i);
 
-                Intent intent = new Intent(getContext(),TimeTableActivity.class);
+                Intent intent = new Intent(BuildingActivity.this,TimeTableActivity.class);
                 intent.putExtra("classroom",item.getClassroom());
-                intent.putExtra("isBuilding",false);
+                intent.putExtra("isBuilding",true);
                 startActivity(intent);
             }
         });
 
         loadList();
-        return view;
     }
-
     public void loadList(){
-        helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
+        helper=new MyDBHelper(this,"lecture_list.db",null,1);
         SQLiteDatabase db=helper.getReadableDatabase();
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (classroom TEXT)");
-        Cursor c = db.rawQuery("SELECT * FROM bookmarklist ;", null);
-        while (c.moveToNext()){
-            String classroom=c.getString(0);
-            checkedlist.add(classroom);
-        }
-        c.close();
+        Cursor c;
         int count=0;
         c = db.rawQuery("SELECT * FROM classroomlist ;", null);
         while(c.moveToNext()){
             String classroom=c.getString(0);
             String time=c.getString(1);
-            for(int i=0;i<checkedlist.size();i++){
-                if(checkedlist.get(i).equals(classroom))//즐겨찾기에 추가 되어잇음
-                {
-                    adapter.addItem(classroom,time,Color.RED);
-                    count++;
-                    break;
-                }
+
+            //강의실 이름에 빌딩 이름 포함시 추가
+            if(classroom.contains(buildingName)) {
+                adapter.addItem(classroom, time, Color.RED);
+                count++;
             }
-            if(count==checkedlist.size())
-                break;
         }
 
-        for(int i=0;i<checkedlist.size();i++)
+        for(int i=0;i<adapter.getCount();i++)
         {
             BookMarkItem item=(BookMarkItem)adapter.getItem(i);
-            listView.setItemChecked(i,true);//전부 체크 시켜주기
             if(classification(item.getClassroom())==true)//이용가능시 초록색
             {
                 item.setButton_color(Color.GREEN);
@@ -131,7 +108,7 @@ public class FragmentB extends Fragment {
 
         boolean isPossible = true;
 
-        helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
+        helper=new MyDBHelper(this,"lecture_list.db",null,1);
         SQLiteDatabase db=helper.getReadableDatabase();
 
         // String test_classroom = "IT융복합관(IT융복합공학관)-245";
