@@ -1,13 +1,8 @@
 package com.jun.vacancyclassroom;
 
-import android.app.ActionBar;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -22,29 +17,15 @@ import android.widget.TextView;
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.MobileAds;
 import com.jun.vacancyclassroom.adapter.ViewPagerAdapter;
+import com.jun.vacancyclassroom.item.Lecture;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 

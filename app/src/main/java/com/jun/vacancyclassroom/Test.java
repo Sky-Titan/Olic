@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.example.vacancyclassroom.R;
+import com.jun.vacancyclassroom.item.Lecture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -409,6 +410,38 @@ public class Test extends AppCompatActivity {
 
         getData("http://121.182.35.52/vacancyclassroom/select_lecture.php");
     }
+    public void MakingClassroomList(){
+        SQLiteDatabase db = openOrCreateDatabase(
+                "lecture_list.db",
+                SQLiteDatabase.CREATE_IF_NECESSARY,
+                null);
+        Cursor c= db.rawQuery("SELECT * FROM lecture",null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS classroomlist (classroom TEXT PRIMARY KEY,time TEXT)");
+        System.out.print("크기:"+c.getCount());
+        int i=0;
+        while(c.moveToNext()){
+            String classroom=c.getString(2);
+            String time=c.getString(3);
+            Cursor c2=db.rawQuery("SELECT * FROM classroomlist WHERE classroom='"+classroom+"'",null);
+            int j=0;
+            while(c2.moveToNext()){
+                j++;
+            }
+            c2.moveToFirst();
+            if(j==0)//classroom이 안들어가있으므로 바로 insert 문사용
+            {
+                db.execSQL("INSERT INTO classroomlist (classroom,time) values('"+classroom+"','"+time+"');");
+            }
+            else {//이미 들어가 있으므로 string에 추가만
+                String time2=c2.getString(1);
+                time2+=","+time;
+                db.execSQL("UPDATE classroomlist SET time='"+time2+"' WHERE classroom='"+classroom+"';");
+            }
+            i++;
+        }
+        if(db!=null)
+            db.close();
+    }
     public void getData(String url){
         class GetDataJSON extends AsyncTask<String, Void, String> {
             @Override
@@ -477,6 +510,7 @@ public class Test extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+    //서버로 보낼때
     class InsertData extends AsyncTask<String, Void, String> {
         ProgressDialog progressDialog;
 

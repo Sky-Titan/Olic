@@ -1,4 +1,4 @@
-package com.jun.vacancyclassroom;
+package com.jun.vacancyclassroom.item;
 
 public class Lecture {
     String code,title,classroom,time;

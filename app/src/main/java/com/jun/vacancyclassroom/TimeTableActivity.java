@@ -32,8 +32,6 @@ import java.util.TimeZone;
 public class TimeTableActivity extends AppCompatActivity {
 
     ArrayList<String> arrayList_timetable=new ArrayList<>();
-    ArrayAdapter<String> arrayAdapter_timetable;
-    ArrayList<String> checkedlist=new ArrayList<>();
     MyDBHelper helper;
 
     private AdView mAdView;
@@ -43,16 +41,20 @@ public class TimeTableActivity extends AppCompatActivity {
     Boolean isBookMarked;
     TextView classroom_textview;
     String classroom;
+
+    View view;
+    SQLiteDatabase db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View view = getLayoutInflater().from(this).inflate(R.layout.activity_time_table,null);
+        view = getLayoutInflater().from(this).inflate(R.layout.activity_time_table,null);
+
         setTitle(R.string.semester);//타이틀바 텍스트
         setContentView(view);
 
         Intent intent = getIntent();
         classroom = intent.getExtras().getString("classroom");
-        System.out.println("강의실 : "+classroom);
+
         //강의실 이름 설정
         classroom_textview = (TextView) findViewById(R.id.classroom_name_timetable);
         classroom_textview.setText(classroom);
@@ -66,7 +68,7 @@ public class TimeTableActivity extends AppCompatActivity {
 
 
         helper=new MyDBHelper(this,"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
+        db=helper.getReadableDatabase();
 
         db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (classroom TEXT)");
         Cursor c = db.rawQuery("SELECT * FROM bookmarklist WHERE classroom ='"+classroom+"';", null);
@@ -124,9 +126,18 @@ public class TimeTableActivity extends AppCompatActivity {
         if(db!=null)
             db.close();
 
+
+
+        makeTimeTable();
+        //db닫기
+
+    }
+    public void makeTimeTable()
+    {
+
         helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
         db=helper.getReadableDatabase();
-        cursor=db.rawQuery("SELECT * FROM classroomlist WHERE classroom = '"+classroom+"';",null);
+        Cursor cursor=db.rawQuery("SELECT * FROM classroomlist WHERE classroom = '"+classroom+"';",null);
         String time="";
         while (cursor.moveToNext())
             time = cursor.getString(1);
@@ -177,6 +188,8 @@ public class TimeTableActivity extends AppCompatActivity {
                 int after_hour_num = Integer.parseInt(after_hour);
                 int before_minute_num = Integer.parseInt(before_minute);
                 int after_minute_num = Integer.parseInt(after_minute);
+
+                //토,일요일은 제외
                 if(day.equals("토") || day.equals("일"))
                     continue;
 
@@ -194,6 +207,7 @@ public class TimeTableActivity extends AppCompatActivity {
                     after_minute_num = 0;
                     after_minute = "00";
                 }
+                //시작시간 종료 시간 같은 경우는 skip
                 if(before_hour_num == after_hour_num && before_minute_num == after_minute_num)
                 {
 
@@ -204,8 +218,8 @@ public class TimeTableActivity extends AppCompatActivity {
 
                     int result = hour_subtract + minute_subtract;//span 해야될 row 개수
                     int row = (before_hour_num - 9) * 2 + (before_minute_num == 30 ?  2 : 1)   ;//행번호
+
                     //병합된 셀들 제거 작업 result수만큼 제거
-                    int temp=0;
                     for(int j = 0;j < result - 1; j++)
                     {
                         String delete_cell_hour = before_minute_num == 30 ? ( before_hour_num + 1 < 10 ? "0" + String.valueOf(before_hour_num + 1) : String.valueOf(before_hour_num + 1)) : (before_hour_num < 10 ? "0" + String.valueOf(before_hour_num) : String.valueOf(before_hour_num) );
@@ -215,13 +229,13 @@ public class TimeTableActivity extends AppCompatActivity {
                         String delete_cell_name = dayToEnglish(day)+delete_cell_hour+delete_cell_minute;
                         TextView deleteCell = (TextView) view.findViewWithTag(delete_cell_name);
 
-                        System.out.println("delete : " + delete_cell_name);
+                        //System.out.println("delete : " + delete_cell_name);
                         GridLayout gridLayout2 = (GridLayout)view.findViewById(R.id.gridlayout_timetable);
                         gridLayout2.removeView(deleteCell);
                     }
 
                     String IDofSpanCell = dayToEnglish(day) + before_hour + before_minute;//span해야할 cell의 id
-                    System.out.println("Spancell id : "+IDofSpanCell);
+                    //System.out.println("Spancell id : "+IDofSpanCell);
                     TextView spanCell = (TextView) view.findViewWithTag(IDofSpanCell);//span cell
                     GridLayout.LayoutParams layoutParams = (GridLayout.LayoutParams)spanCell.getLayoutParams();
                     layoutParams.columnSpec = GridLayout.spec(dayToNum(day));
@@ -235,19 +249,12 @@ public class TimeTableActivity extends AppCompatActivity {
 
                     spanCell.setBackground(getResources().getDrawable(R.drawable.fill_cell));
                 }
-
-
-
-
             } else if (i % 3 == 1) {//~
                 times[i] = tokens.nextToken();
             }
 
         }
-        //db닫기
-
     }
-
     public int dayToNum(String day)
     {
         if (day.equals("월"))

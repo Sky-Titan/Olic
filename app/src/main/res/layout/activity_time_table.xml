@@ -22,16 +22,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
-            android:id="@+id/classroom_name_timetable"
-            android:text="강의실 이름"
-            android:textSize="20dp"
-            android:textColor="@color/black"
-            android:textAlignment="center"
-            android:layout_weight="5"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
+        android:id="@+id/classroom_name_timetable"
+        android:text="강의실 이름"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:layout_weight="5"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
         <Button
             android:id="@+id/isPossibleButton_timetable"
             android:background="@color/red"
