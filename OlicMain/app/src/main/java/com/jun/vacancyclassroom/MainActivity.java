@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         setTitle(R.string.semester);//타이틀바 텍스트
             setContentView(R.layout.activity_main);
 
-            DBversion = getResources().getString(R.string.semester);//현재 학기를 db버전으로 사용
+            DBversion = "20192-1";//현재 학기를 db버전으로 사용
 
         MobileAds.initialize(this, "ca-app-pub-7245602797811817~6821353940");
         SharedPreferences sf = getSharedPreferences("sFile",MODE_PRIVATE);
