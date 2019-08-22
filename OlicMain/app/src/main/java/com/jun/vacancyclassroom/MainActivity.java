@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
         File outfile = new File(PACKAGE_DIR + "/" + DATABASE_NAME);
 
-        if (outfile.length() <= 0) {
+ //       if (outfile.length() <= 0) {
             AssetManager assetManager = ctx.getResources().getAssets();
             try {
                 InputStream is = assetManager.open(DATABASE_NAME, AssetManager.ACCESS_BUFFER);
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+   //     }
     }
 
     private void setupViewPager(ViewPager viewPager) {
