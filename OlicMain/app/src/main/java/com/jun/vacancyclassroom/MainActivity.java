@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG_TITLE = "title";
     private static final String TAG_TIME = "time";
 
-
+    private String DBversion;//현재 학기를 db버전으로 사용
     /*
     db 만들기 parsing->insertdata->classification(강의실 이름)
     */
@@ -98,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         //저장을 하기위해 editor를 이용하여 값을 저장시켜준다.
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        String text = "true";
-        editor.putString("first",text); // key, value를 이용하여 저장하는 형태
+        editor.putString("DB",DBversion); // key, value를 이용하여 저장하는 형태
 
 
         //최종 커밋
@@ -113,10 +112,12 @@ public class MainActivity extends AppCompatActivity {
         setTitle(R.string.semester);//타이틀바 텍스트
             setContentView(R.layout.activity_main);
 
+            DBversion = getResources().getString(R.string.semester);//현재 학기를 db버전으로 사용
+
         MobileAds.initialize(this, "ca-app-pub-7245602797811817~6821353940");
         SharedPreferences sf = getSharedPreferences("sFile",MODE_PRIVATE);
-        String text = sf.getString("first","");//첫 사용인지 구분
-        if(text.equals(""))//첫사용일시
+        String text = sf.getString("DB","");//첫 사용인지 구분
+        if(!text.equals(DBversion))//첫사용 혹은 db업데이트일때 -> db복제
         {
             //db복제
             initialize(getApplicationContext());
