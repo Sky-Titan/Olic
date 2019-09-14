@@ -3,6 +3,8 @@ package com.jun.vacancyclassroom;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -111,6 +113,11 @@ public class MainActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
         setTitle(R.string.semester);//타이틀바 텍스트
             setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP)
+        {
+            getWindow().setStatusBarColor(getColor(R.color.statusBar_color));
+        }
 
             DBversion = "20192-1";//현재 학기를 db버전으로 사용
 

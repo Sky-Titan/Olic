@@ -17,4 +17,5 @@
     <color name="dark_yellow">#FFE400</color>
     <color name="skyblue">#4374D9</color>
     <color name="dark_skyblue">#396ACF</color>
+    <color name="statusBar_color">#FF000000</color>
 </resources>

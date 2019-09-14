@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -38,6 +39,11 @@ public class BuildingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_building);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP)
+        {
+            getWindow().setStatusBarColor(getColor(R.color.statusBar_color));
+        }
 
         mAdView = (AdView) findViewById(R.id.adView5);
         AdRequest adRequest = new AdRequest.Builder()

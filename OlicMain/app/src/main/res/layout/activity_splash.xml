@@ -31,6 +31,7 @@
         android:textAlignment="center"/>
     <ImageView
         android:id="@+id/roomimg_splash"
+        android:src="@drawable/baseline_meeting_room_white_48"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -48,6 +49,11 @@ public class TimeTableActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = getLayoutInflater().from(this).inflate(R.layout.activity_time_table,null);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP)
+        {
+            getWindow().setStatusBarColor(getColor(R.color.statusBar_color));
+        }
 
         setTitle(R.string.semester);//타이틀바 텍스트
         setContentView(view);
