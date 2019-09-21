@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context="com.jun.vacancyclassroom.FragmentB">
 
+
     <com.google.android.gms.ads.AdView
         xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView2"
@@ -18,6 +19,22 @@
         android:layout_gravity="center_horizontal"
         ads:adUnitId="ca-app-pub-7245602797811817/8402507853">
     </com.google.android.gms.ads.AdView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TimePicker
+            android:id="@+id/timePicker"
+            android:timePickerMode="spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="150dp"></TimePicker>
+
+
+    </LinearLayout>
+
 
     <ListView
         android:id="@+id/searchlist_b"

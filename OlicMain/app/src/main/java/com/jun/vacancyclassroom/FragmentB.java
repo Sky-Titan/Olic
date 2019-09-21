@@ -1,7 +1,10 @@
 package com.jun.vacancyclassroom;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.vacancyclassroom.R;
@@ -37,6 +41,8 @@ public class FragmentB extends Fragment {
     MyDBHelper helper;
     private AdView mAdView;
     View view;
+    TimePicker timePicker;
+    BroadcastReceiver timeReceiver;
 
     public FragmentB() {
         // Required empty public constructor
@@ -54,6 +60,53 @@ public class FragmentB extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_b,container,false);
+
+        timePicker = (TimePicker) view.findViewById(R.id.timePicker);//타임픽커 현재 시간으로 설정
+        timePicker.setIs24HourView(true);
+
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+        Calendar now = Calendar.getInstance(timeZone);
+        int hour = now.get(Calendar.HOUR_OF_DAY);
+        int minute = now.get(Calendar.MINUTE);
+        timePicker.setHour(hour);
+        timePicker.setMinute(minute);
+
+        timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker timePicker, int i, int i1) {
+                adapter=new BookMarkAdapter();
+                listView.setAdapter(adapter);
+                loadList();
+            }
+        });
+
+        timeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+
+                if (action.equals(Intent.ACTION_TIME_TICK)) {
+                   //
+                    TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+                    Calendar now = Calendar.getInstance(timeZone);
+                    int hour = now.get(Calendar.HOUR_OF_DAY);
+                    int minute = now.get(Calendar.MINUTE);
+                    timePicker.setHour(hour);
+                    timePicker.setMinute(minute);
+
+                    adapter=new BookMarkAdapter();
+                    listView.setAdapter(adapter);
+                    loadList();
+                }
+            }
+        };
+
+
+
+        IntentFilter _intentFilter = new IntentFilter();
+        _intentFilter.addAction(Intent.ACTION_TIME_TICK);
+
+        getActivity().registerReceiver(timeReceiver, _intentFilter);
 
         System.out.println("Fragment B 출력");
         mAdView = (AdView) view.findViewById(R.id.adView2);
@@ -85,6 +138,8 @@ public class FragmentB extends Fragment {
         helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
         SQLiteDatabase db=helper.getReadableDatabase();
 
+        checkedlist.clear();
+
         db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (classroom TEXT)");
         Cursor c = db.rawQuery("SELECT * FROM bookmarklist ;", null);
         while (c.moveToNext()){
@@ -109,11 +164,18 @@ public class FragmentB extends Fragment {
                 break;
         }
 
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+        Calendar now = Calendar.getInstance(timeZone);
+
+        int day = now.get(Calendar.DAY_OF_WEEK);
+        int hour = timePicker.getHour();
+        int minute = timePicker.getMinute();
+
         for(int i=0;i<checkedlist.size();i++)
         {
             BookMarkItem item=(BookMarkItem)adapter.getItem(i);
             listView.setItemChecked(i,true);//전부 체크 시켜주기
-            if(classification(item.getClassroom())==true)//이용가능시 초록색
+            if(classification(item.getClassroom(),day,hour,minute)==true)//이용가능시 초록색
             {
                 item.setButton_color(Color.GREEN);
             }
@@ -122,12 +184,13 @@ public class FragmentB extends Fragment {
             }
         }
         c.close();
+
         if(db!=null)
             db.close();
 
     }
     //해당 교실이 현재 시간에 이용가능한지 판단
-    public boolean classification(String classroom_name) {
+    public boolean classification(String classroom_name,int day_n,int hour_n, int minute_n) {
 
         boolean isPossible = true;
 
@@ -140,14 +203,14 @@ public class FragmentB extends Fragment {
         현재 시간 불러오기
          */
 
-        TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
-        Calendar now = Calendar.getInstance(timeZone);
+        //TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+        //Calendar now = Calendar.getInstance(timeZone);
 
-        String day1=dayToKorean(now.get(Calendar.DAY_OF_WEEK));
+        String day1=dayToKorean(day_n);
 
-        String hour=String.valueOf(now.get(Calendar.HOUR_OF_DAY));
+        String hour=String.valueOf(hour_n);
 
-        String minute=String.valueOf(now.get(Calendar.MINUTE));
+        String minute=String.valueOf(minute_n);
         System.out.println(day1+hour+":"+minute);
 
         String day_today = day1;//현재요일
