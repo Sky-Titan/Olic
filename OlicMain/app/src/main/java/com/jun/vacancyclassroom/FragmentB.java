@@ -14,7 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -35,6 +38,8 @@ import java.util.TimeZone;
  */
 public class FragmentB extends Fragment {
 
+    LinearLayout layout_time;
+    Button currentTime,visibility_time;
     BookMarkAdapter adapter;
     ListView listView;
     ArrayList<String> checkedlist=new ArrayList<>();
@@ -42,6 +47,7 @@ public class FragmentB extends Fragment {
     private AdView mAdView;
     View view;
     TimePicker timePicker;
+    NumberPicker dayPicker;
     BroadcastReceiver timeReceiver;
 
     public FragmentB() {
@@ -80,33 +86,59 @@ public class FragmentB extends Fragment {
             }
         });
 
-        timeReceiver = new BroadcastReceiver() {
+        dayPicker = (NumberPicker) view.findViewById(R.id.dayPicker);
+        dayPicker.setDisplayedValues(new String[]{"일","월","화","수","목","금","토"});
+        dayPicker.setMinValue(1);
+        dayPicker.setMaxValue(7);
+        dayPicker.setValue(now.get(Calendar.DAY_OF_WEEK));
+        dayPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
-            public void onReceive(Context context, Intent intent) {
-                final String action = intent.getAction();
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                adapter=new BookMarkAdapter();
+                listView.setAdapter(adapter);
+                loadList();
+            }
+        });
 
-                if (action.equals(Intent.ACTION_TIME_TICK)) {
-                   //
-                    TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
-                    Calendar now = Calendar.getInstance(timeZone);
-                    int hour = now.get(Calendar.HOUR_OF_DAY);
-                    int minute = now.get(Calendar.MINUTE);
-                    timePicker.setHour(hour);
-                    timePicker.setMinute(minute);
+        currentTime = (Button) view.findViewById(R.id.currentTime_btn);
+        currentTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-                    adapter=new BookMarkAdapter();
-                    listView.setAdapter(adapter);
-                    loadList();
+                TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+                Calendar now = Calendar.getInstance(timeZone);
+                int hour = now.get(Calendar.HOUR_OF_DAY);
+                int minute = now.get(Calendar.MINUTE);
+                timePicker.setHour(hour);
+                timePicker.setMinute(minute);
+                dayPicker.setValue(now.get(Calendar.DAY_OF_WEEK));
+
+                adapter=new BookMarkAdapter();
+                listView.setAdapter(adapter);
+                loadList();
+            }
+        });
+
+        layout_time = (LinearLayout) view.findViewById(R.id.linearLayout_time);
+
+        visibility_time = (Button) view.findViewById(R.id.visible_btn);
+        visibility_time.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(layout_time.getVisibility() == View.VISIBLE)//끄기
+                {
+                    layout_time.setVisibility(View.GONE);
+                    visibility_time.setText("시간 설정 보이기");
+                    visibility_time.setCompoundDrawablesWithIntrinsicBounds(null,null,getActivity().getDrawable(R.drawable.ic_arrow_drop_down_black_36dp),null);
+                }
+                else//켜기
+                {
+                    layout_time.setVisibility(View.VISIBLE);
+                    visibility_time.setText("시간 설정 숨기기");
+                    visibility_time.setCompoundDrawablesWithIntrinsicBounds(null,null,getActivity().getDrawable(R.drawable.ic_arrow_drop_up_black_36dp),null);
                 }
             }
-        };
-
-
-
-        IntentFilter _intentFilter = new IntentFilter();
-        _intentFilter.addAction(Intent.ACTION_TIME_TICK);
-
-        getActivity().registerReceiver(timeReceiver, _intentFilter);
+        });
 
         System.out.println("Fragment B 출력");
         mAdView = (AdView) view.findViewById(R.id.adView2);
@@ -164,10 +196,7 @@ public class FragmentB extends Fragment {
                 break;
         }
 
-        TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
-        Calendar now = Calendar.getInstance(timeZone);
-
-        int day = now.get(Calendar.DAY_OF_WEEK);
+        int day = dayPicker.getValue();
         int hour = timePicker.getHour();
         int minute = timePicker.getMinute();
 

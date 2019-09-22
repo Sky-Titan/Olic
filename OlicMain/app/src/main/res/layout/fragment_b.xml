@@ -20,18 +20,50 @@
         ads:adUnitId="ca-app-pub-7245602797811817/8402507853">
     </com.google.android.gms.ads.AdView>
 
+    <Button
+        android:id="@+id/visible_btn"
+        android:text="시간 설정 숨기기"
+        android:layout_gravity="right"
+        android:background="@drawable/ripple_transparent"
+        android:drawableRight="@drawable/ic_arrow_drop_up_black_36dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
     <LinearLayout
-        android:orientation="horizontal"
-        android:gravity="center"
+        android:id="@+id/linearLayout_time"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TimePicker
-            android:id="@+id/timePicker"
-            android:timePickerMode="spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="150dp"></TimePicker>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+            <NumberPicker
+                android:id="@+id/dayPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"></NumberPicker>
+            <TimePicker
+                android:id="@+id/timePicker"
+                android:timePickerMode="spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"></TimePicker>
 
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/currentTime_btn"
+            android:text="현재 시간"
+            android:textColor="@color/white"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/ripple_lime_green"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
