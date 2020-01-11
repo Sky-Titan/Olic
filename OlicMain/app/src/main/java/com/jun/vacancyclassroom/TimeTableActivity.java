@@ -55,7 +55,8 @@ public class TimeTableActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(getColor(R.color.statusBar_color));
         }
 
-        setTitle(R.string.semester);//타이틀바 텍스트
+        Myapplication myapplication = (Myapplication)getApplication();
+        setTitle(myapplication.getCurrentSemester());
         setContentView(view);
 
         Intent intent = getIntent();

@@ -6,13 +6,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name="com.jun.vacancyclassroom.Myapplication"
         android:allowBackup="true"
         android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.jun.vacancyclassroom.BuildingActivity"></activity>
+        <activity android:name="com.jun.vacancyclassroom.LoadingActivity"></activity>
+        <activity android:name="com.jun.vacancyclassroom.BuildingActivity" />
         <activity
             android:name="com.jun.vacancyclassroom.TimeTableActivity"
             android:screenOrientation="portrait" />

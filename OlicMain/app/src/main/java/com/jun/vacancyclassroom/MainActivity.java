@@ -90,45 +90,31 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     };
-    @Override
-    protected void onStop() {
-        super.onStop();
 
-        // Activity가 종료되기 전에 저장한다.
-        //SharedPreferences를 sFile이름, 기본모드로 설정
-        SharedPreferences sharedPreferences = getSharedPreferences("sFile",MODE_PRIVATE);
-
-        //저장을 하기위해 editor를 이용하여 값을 저장시켜준다.
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("DB",DBversion); // key, value를 이용하여 저장하는 형태
-
-
-        //최종 커밋
-        editor.commit();
-
-
-    }
     @Override
     public void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
-        setTitle(R.string.semester);//타이틀바 텍스트
+        //setTitle(R.string.semester);//타이틀바 텍스트
             setContentView(R.layout.activity_main);
+
+            Myapplication myapplication = (Myapplication)getApplication();
+            setTitle(myapplication.getCurrentSemester());
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP)
         {
             getWindow().setStatusBarColor(getColor(R.color.statusBar_color));
         }
 
-            DBversion = "20192-1";//현재 학기를 db버전으로 사용
+        //    DBversion = "20192-1";//현재 학기를 db버전으로 사용
 
         MobileAds.initialize(this, "ca-app-pub-7245602797811817~6821353940");
-        SharedPreferences sf = getSharedPreferences("sFile",MODE_PRIVATE);
+ /*       SharedPreferences sf = getSharedPreferences("sFile",MODE_PRIVATE);
         String text = sf.getString("DB","");//첫 사용인지 구분
         if(!text.equals(DBversion))//첫사용 혹은 db업데이트일때 -> db복제
         {
             //db복제
             initialize(getApplicationContext());
-        }
+        }*/
        final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         mViewPager=(NonSwipeViewPager)findViewById(R.id.fragment_container);
         mViewPager.setPagingDisabled();//터치 스와이프 못하게 하기
