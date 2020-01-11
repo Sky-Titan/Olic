@@ -3,10 +3,12 @@ package com.jun.vacancyclassroom;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jun.vacancyclassroom.item.Lecture;
 
@@ -691,6 +693,18 @@ public class UpdateDB {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                SharedPreferences sf = context.getSharedPreferences("sFile",Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sf.edit();
+                editor.putString("DB",""); // key, value를 이용하여 저장하는 형태
+
+
+                //최종 커밋
+                editor.commit();
+
+                LoadingActivity loadingActivity = (LoadingActivity) LoadingActivity.activity;
+                loadingActivity.finish();
+
+                return  null;
             }
             return null;
         }

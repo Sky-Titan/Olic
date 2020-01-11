@@ -1,8 +1,11 @@
 package com.jun.vacancyclassroom;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,9 +15,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.MobileAds;
@@ -91,6 +97,57 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    //동기화버튼 표시
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.timetable_synch, menu);
+        return true;
+    }
+
+    //동기화 버튼 누르면 동작
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.synch_btn1:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("시간표 동기화");
+                builder.setMessage("시간표를 새로 동기화 하시겠습니까?");
+                builder.setPositiveButton("동기화",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(getApplicationContext(),"시간표를 새로 동기화합니다.",Toast.LENGTH_LONG).show();
+
+                                MyDBHelper helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
+                                SQLiteDatabase db=helper.getReadableDatabase();
+                                db.execSQL("DROP TABLE IF EXISTS classroomlist");
+                                db.execSQL("DROP TABLE IF EXISTS bookmarklist");
+                                db.execSQL("DROP TABLE IF EXISTS lecture");
+                                db.close();
+                                //동기화
+                                Myapplication myapplication = (Myapplication) getApplication();
+                                String version = myapplication.getCurrentSemester();
+                                int year = Integer.parseInt(version.substring(0,4));
+                                String semester = version.substring(4,5);
+                                Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
+                                intent.putExtra("semester",semester);
+                                intent.putExtra("year",year);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                builder.setNegativeButton("취소",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(getApplicationContext(),"취소",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                builder.show();
+                return true;
+                default:
+                    return true;
+        }
+    }
     @Override
     public void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
