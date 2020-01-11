@@ -2,7 +2,10 @@ package com.jun.vacancyclassroom;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vacancyclassroom.R;
 
@@ -99,24 +103,7 @@ public class SplashActivity extends AppCompatActivity {
         });*/
 
     }
-    @Override
-    protected void onStop() {
-        super.onStop();
 
-        // Activity가 종료되기 전에 저장한다.
-        //SharedPreferences를 sFile이름, 기본모드로 설정
-        SharedPreferences sharedPreferences = getSharedPreferences("sFile",MODE_PRIVATE);
-
-        //저장을 하기위해 editor를 이용하여 값을 저장시켜준다.
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("DB",DBversion); // key, value를 이용하여 저장하는 형태
-
-
-        //최종 커밋
-        editor.commit();
-
-
-    }
     private class splashhandler implements Runnable{
         public void run(){
 
@@ -157,22 +144,36 @@ public class SplashActivity extends AppCompatActivity {
             {
 
                 System.out.println("업데이트!");
-                //db업데이트
-                Intent intent = new Intent(SplashActivity.this, LoadingActivity.class);
-                intent.putExtra("semester",semester);
-                intent.putExtra("year",year);
-                startActivity(intent);
+
+                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+                if(networkInfo != null && networkInfo.isConnected()) {
+                    MyDBHelper helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
+                    SQLiteDatabase db=helper.getReadableDatabase();
+                    db.execSQL("DROP TABLE IF EXISTS classroomlist");
+                    db.execSQL("DROP TABLE IF EXISTS bookmarklist");
+                    db.execSQL("DROP TABLE IF EXISTS lecture");
+                    db.close();
+                    //db업데이트
+                    Intent intent = new Intent(SplashActivity.this, LoadingActivity.class);
+                    intent.putExtra("semester",semester);
+                    intent.putExtra("year",year);
+                    startActivity(intent);
+                } else {
+                    // 연결되지않음
+                    Toast.makeText(SplashActivity.this,"시간표 동기화를 위해서 인터넷을 연결후 시도해주세요.", Toast.LENGTH_SHORT).show();
+
+                    finish();
+                    return;
+                }
 
             }
             else
             {
-
-
                 //업데이트 필요없으면 바로 메인으로
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-
                 startActivity(intent);
-
             }
 
             SharedPreferences.Editor editor = sf.edit();

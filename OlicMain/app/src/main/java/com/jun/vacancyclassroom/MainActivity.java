@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -118,28 +120,39 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Toast.makeText(getApplicationContext(),"시간표를 새로 동기화합니다.",Toast.LENGTH_LONG).show();
 
-                                MyDBHelper helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
-                                SQLiteDatabase db=helper.getReadableDatabase();
-                                db.execSQL("DROP TABLE IF EXISTS classroomlist");
-                                db.execSQL("DROP TABLE IF EXISTS bookmarklist");
-                                db.execSQL("DROP TABLE IF EXISTS lecture");
-                                db.close();
-                                //동기화
-                                Myapplication myapplication = (Myapplication) getApplication();
-                                String version = myapplication.getCurrentSemester();
-                                int year = Integer.parseInt(version.substring(0,4));
-                                String semester = version.substring(4,5);
-                                Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
-                                intent.putExtra("semester",semester);
-                                intent.putExtra("year",year);
-                                startActivity(intent);
-                                finish();
+                                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+                                if(networkInfo != null && networkInfo.isConnected()) {
+                                    MyDBHelper helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
+                                    SQLiteDatabase db=helper.getReadableDatabase();
+                                    db.execSQL("DROP TABLE IF EXISTS classroomlist");
+                                    db.execSQL("DROP TABLE IF EXISTS bookmarklist");
+                                    db.execSQL("DROP TABLE IF EXISTS lecture");
+                                    db.close();
+                                    //db업데이트
+                                    //동기화
+                                    Myapplication myapplication = (Myapplication) getApplication();
+                                    String version = myapplication.getCurrentSemester();
+                                    int year = Integer.parseInt(version.substring(0,4));
+                                    String semester = version.substring(4,5);
+                                    Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
+                                    intent.putExtra("semester",semester);
+                                    intent.putExtra("year",year);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    // 연결되지않음
+                                    Toast.makeText(MainActivity.this,"시간표 동기화를 위해서 인터넷을 연결후 시도해주세요.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
                             }
                         });
                 builder.setNegativeButton("취소",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(),"취소",Toast.LENGTH_SHORT).show();
+
                             }
                         });
                 builder.show();
@@ -202,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupViewPager(mViewPager);
     }
-
+/*
     //처음 접속시 db파일 에셋에서 불러옴
     public static void initialize(Context ctx) {
         File folder = new File(PACKAGE_DIR);
@@ -228,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             }
    //     }
     }
-
+*/
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         fragment_A = new FragmentA();

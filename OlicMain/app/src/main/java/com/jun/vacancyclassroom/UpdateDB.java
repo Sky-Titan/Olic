@@ -695,7 +695,7 @@ public class UpdateDB {
                 e.printStackTrace();
                 SharedPreferences sf = context.getSharedPreferences("sFile",Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sf.edit();
-                editor.putString("DB",""); // key, value를 이용하여 저장하는 형태
+                editor.putString("DB",""); // exception 발생되서 업데이트 중간에 끊기면 버전 초기화시켜버림
 
 
                 //최종 커밋
