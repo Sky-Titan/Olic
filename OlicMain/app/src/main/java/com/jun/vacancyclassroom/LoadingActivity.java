@@ -52,6 +52,7 @@ public class LoadingActivity extends AppCompatActivity {
         protected void onPreExecute() {
             asyncDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             asyncDialog.setMessage("시간표 동기화 중");
+            asyncDialog.setCancelable(false);
             asyncDialog.setCanceledOnTouchOutside(false);//터치해도 다이얼로그 안 사라짐
             // show dialog 상하단바 제거
             int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
@@ -83,6 +84,12 @@ public class LoadingActivity extends AppCompatActivity {
 
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+    }
+
     public boolean onTouchEvent(MotionEvent event) {
         return false;
 
