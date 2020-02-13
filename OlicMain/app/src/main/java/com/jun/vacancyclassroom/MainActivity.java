@@ -66,8 +66,10 @@ public class MainActivity extends AppCompatActivity {
     FragmentA fragment_A;
     FragmentB fragment_B;
     FragmentC fragment_C;
+    FragmentD fragment_D;
     static final int G_NOTIFY_NUM = 1;
     private NonSwipeViewPager mViewPager;
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -93,6 +95,11 @@ public class MainActivity extends AppCompatActivity {
                     mViewPager.setCurrentItem(2);
                     fragment_C.onResume();
                     return true;
+
+                case R.id.navigation_lectureSearch:
+                    mViewPager.setCurrentItem(3);
+                    fragment_D.onResume();
+                    return true;
             }
 
             return false;
@@ -110,52 +117,61 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
+
         switch (item.getItemId()) {
             case R.id.synch_btn1:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("시간표 동기화");
-                builder.setMessage("시간표를 새로 동기화 하시겠습니까?");
-                builder.setPositiveButton("동기화",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(),"시간표를 새로 동기화합니다.",Toast.LENGTH_LONG).show();
+                if(mViewPager.getCurrentItem()!=3)//db 업데이트
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("시간표 동기화");
+                    builder.setMessage("시간표를 새로 동기화 하시겠습니까?");
+                    builder.setPositiveButton("동기화",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Toast.makeText(getApplicationContext(),"시간표를 새로 동기화합니다.",Toast.LENGTH_LONG).show();
 
-                                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-                                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                                    ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-                                if(networkInfo != null && networkInfo.isConnected()) {
-                                    MyDBHelper helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
-                                    SQLiteDatabase db=helper.getReadableDatabase();
-                                    db.execSQL("DROP TABLE IF EXISTS classroomlist");
-                                    db.execSQL("DROP TABLE IF EXISTS bookmarklist");
-                                    db.execSQL("DROP TABLE IF EXISTS lecture");
-                                    db.close();
-                                    //db업데이트
-                                    //동기화
-                                    Myapplication myapplication = (Myapplication) getApplication();
-                                    String version = myapplication.getCurrentSemester();
-                                    int year = Integer.parseInt(version.substring(0,4));
-                                    String semester = version.substring(4,5);
-                                    Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
-                                    intent.putExtra("semester",semester);
-                                    intent.putExtra("year",year);
-                                    startActivity(intent);
-                                    finish();
-                                } else {
-                                    // 연결되지않음
-                                    Toast.makeText(MainActivity.this,"시간표 동기화를 위해서 인터넷을 연결후 시도해주세요.", Toast.LENGTH_SHORT).show();
-                                    return;
+                                    if(networkInfo != null && networkInfo.isConnected()) {
+                                        MyDBHelper helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
+                                        SQLiteDatabase db=helper.getReadableDatabase();
+                                        db.execSQL("DROP TABLE IF EXISTS classroomlist");
+                                        db.execSQL("DROP TABLE IF EXISTS bookmarklist");
+                                        db.execSQL("DROP TABLE IF EXISTS lecture");
+                                        db.close();
+                                        //db업데이트
+                                        //동기화
+                                        Myapplication myapplication = (Myapplication) getApplication();
+                                        String version = myapplication.getCurrentSemester();
+                                        int year = Integer.parseInt(version.substring(0,4));
+                                        String semester = version.substring(4,5);
+                                        Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
+                                        intent.putExtra("semester",semester);
+                                        intent.putExtra("year",year);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        // 연결되지않음
+                                        Toast.makeText(MainActivity.this,"시간표 동기화를 위해서 인터넷을 연결후 시도해주세요.", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+
                                 }
+                            });
+                    builder.setNegativeButton("취소",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
 
-                            }
-                        });
-                builder.setNegativeButton("취소",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
+                    builder.show();
+                }
+                else//수강신청현황
+                {
+                    fragment_D.loadAdapter();//새로고침
+                }
 
-                            }
-                        });
-                builder.show();
                 return true;
                 default:
                     return true;
@@ -169,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
             Myapplication myapplication = (Myapplication)getApplication();
             setTitle(myapplication.getCurrentSemester());
+
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP)
         {
@@ -247,9 +264,11 @@ public class MainActivity extends AppCompatActivity {
         fragment_A = new FragmentA();
         fragment_B = new FragmentB();
         fragment_C = new FragmentC();
+        fragment_D = new FragmentD();
         viewPagerAdapter.addFragment(fragment_A);
         viewPagerAdapter.addFragment(fragment_B);
         viewPagerAdapter.addFragment(fragment_C);
+        viewPagerAdapter.addFragment(fragment_D);
         viewPager.setAdapter(viewPagerAdapter);
     }
 

@@ -2,8 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <item android:id="@+id/synch_btn1"
         android:title="synch"
         android:icon="@drawable/synch_ic"
         app:showAsAction="always" />
+
 </menu>

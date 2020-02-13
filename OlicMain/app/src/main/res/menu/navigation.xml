@@ -6,13 +6,15 @@
         android:id="@+id/navigation_home"
         app:showAsAction="always"
         android:enabled="true"
-        android:icon="@drawable/baseline_search_black_36"
+        android:titleCondensed="강의실"
+        android:icon="@drawable/baseline_search_black_24"
         android:title="@string/title_home" />
 
     <item
         android:id="@+id/navigation_dashboard"
         app:showAsAction="always"
         android:enabled="true"
+        android:titleCondensed="즐겨찾기"
         android:icon="@drawable/baseline_bookmarks_black_24"
         android:title="@string/title_dashboard" />
 
@@ -20,6 +22,15 @@
         android:id="@+id/navigation_buildingSearch"
         app:showAsAction="always"
         android:enabled="true"
-        android:icon="@drawable/baseline_place_black_48"
+        android:titleCondensed="건물검색"
+        android:icon="@drawable/baseline_place_black_24"
         android:title="@string/title_building" />
+
+    <item
+        android:id="@+id/navigation_lectureSearch"
+        app:showAsAction="always"
+        android:titleCondensed="수강현황"
+        android:enabled="true"
+        android:icon="@drawable/ic_lecture"
+        android:title="@string/title_lecture" />
 </menu>
