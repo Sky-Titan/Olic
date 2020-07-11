@@ -84,14 +84,8 @@ public class FragmentD extends Fragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
 
-                                helper=new MyDBHelper(getContext(),"lecture_mark.db",null,1);
-                                SQLiteDatabase db=helper.getReadableDatabase();
-
-                                db.execSQL("DELETE FROM lecture_mark WHERE code = '" + lecture.getCode() + "';");
-                                loadAdapter();//새로고침
+                                deleteLecture_DB(lecture.getCode());
                                 Toast.makeText(getContext(),"삭제하였습니다.",Toast.LENGTH_SHORT).show();
-                                if(db!=null)
-                                    db.close();
 
                             }
                         });
@@ -140,6 +134,10 @@ public class FragmentD extends Fragment {
 
         Cursor cursor=db.rawQuery("SELECT * FROM lecture_mark",null);
 
+        //존재하는 lecture가 없으면 바로 종료
+        if(cursor.getCount() == 0)
+            return;
+
         codes = new ArrayList<>();
         while(cursor.moveToNext()){
             String code=cursor.getString(0);
@@ -170,6 +168,20 @@ public class FragmentD extends Fragment {
         if(db!=null)
             db.close();
     }
+
+    //강의 삭제
+    public void deleteLecture_DB(String code)
+    {
+        helper=new MyDBHelper(getContext(),"lecture_mark.db",null,1);
+        SQLiteDatabase db=helper.getReadableDatabase();
+
+        db.execSQL("DELETE FROM lecture_mark WHERE code = '" + code + "';");
+        loadAdapter();//새로고침
+
+        if(db!=null)
+            db.close();
+    }
+
 
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
 
@@ -259,7 +271,7 @@ public class FragmentD extends Fragment {
 
                     final Document doc = Jsoup.connect(url).get();
 
-                    System.out.println("main url : " + url);
+                    //System.out.println("main url : " + url);
 
 
                     final Elements titles = doc.select("td.subj_class_cde");//과목코드
@@ -270,20 +282,28 @@ public class FragmentD extends Fragment {
                     final Elements titles6 = doc.select("td.lect_quota");//수강정원
                     final Elements titles7 = doc.select("td.lect_req_cnt");//수강신청인원
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            int color =0;
+                    if(titles.hasText())
+                    {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                int color =0;
 
-                            if(Integer.parseInt(titles6.get(0).text()) > Integer.parseInt(titles7.get(0).text())) // 수강정원 > 신청현황 => 신청가능
-                                color = Color.GREEN;
-                            else//신청불가
-                                color = Color.RED;
+                                if(Integer.parseInt(titles6.get(0).text()) > Integer.parseInt(titles7.get(0).text())) // 수강정원 > 신청현황 => 신청가능
+                                    color = Color.GREEN;
+                                else//신청불가
+                                    color = Color.RED;
 
-                            adapter.addItem(titles.get(0).text(), titles2.get(0).text(), titles3.get(0).text(), titles4.get(0).text(), titles5.get(0).text(), titles6.get(0).text(), titles7.get(0).text(), color);
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
+                                adapter.addItem(titles.get(0).text(), titles2.get(0).text(), titles3.get(0).text(), titles4.get(0).text(), titles5.get(0).text(), titles6.get(0).text(), titles7.get(0).text(), color);
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                    else//존재하지 않으면 삭제
+                    {
+                        deleteLecture_DB(current_subj_cde);
+                    }
+
 
                 }
 
