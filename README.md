@@ -5,7 +5,7 @@
 
 ## 관련 링크
 ------------------
-- 블로그 : https://play.google.com/store/apps/details?id=com.jun.vacancyclassroom
+- 구글  : https://play.google.com/store/apps/details?id=com.jun.vacancyclassroom
 - 개발자 이메일 : er65119@naver.com
 
 
