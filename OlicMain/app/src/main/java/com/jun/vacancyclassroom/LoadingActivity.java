@@ -39,7 +39,6 @@ public class LoadingActivity extends AppCompatActivity {
 
     public void loadingfinish()
     {
-
         finish();
     }
     private class CheckTypesTask extends AsyncTask<Void, Void, Void> {

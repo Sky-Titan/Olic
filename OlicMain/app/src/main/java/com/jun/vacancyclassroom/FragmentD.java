@@ -70,7 +70,35 @@ public class FragmentD extends Fragment {
         view=inflater.inflate(R.layout.fragment_d,container,false);
 
 
+        setListView();
+
+        //adapter 새로고침
+        loadAdapter();
+
+        add_lecture_edit = (EditText) view.findViewById(R.id.add_lecture_edit);
+
+        setAddLectureBtn();
+
+        return view;
+    }
+
+    private void setAddLectureBtn() {
+        add_lecture = (Button) view.findViewById(R.id.add_lecture_btn);//강의 추가하기 버튼
+        add_lecture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                //강의 추가 버튼 누르면 Jsoup으로 해당강의가 존재하는지 검색 있으면 바로 추가, 없으면 에러 메시지 띄움
+                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
+                jsoupAsyncTask.execute();
+            }
+        });
+    }
+
+    private void setListView()
+    {
         listView=(ListView)view.findViewById(R.id.lecturelist_d);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -89,33 +117,11 @@ public class FragmentD extends Fragment {
 
                             }
                         });
-                builder.setNegativeButton("취소",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
 
-                            }
-                        });
+                builder.setNegativeButton("취소", null);
                 builder.show();
             }
         });
-
-        //adapter 새로고침
-        loadAdapter();
-
-        add_lecture_edit = (EditText) view.findViewById(R.id.add_lecture_edit);
-
-        add_lecture = (Button) view.findViewById(R.id.add_lecture_btn);//강의 추가하기 버튼
-        add_lecture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //강의 추가 버튼 누르면 Jsoup으로 해당강의가 존재하는지 검색 있으면 바로 추가, 없으면 에러 메시지 띄움
-
-                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-                jsoupAsyncTask.execute();
-            }
-        });
-
-        return view;
     }
 
     //새로고침
@@ -126,8 +132,7 @@ public class FragmentD extends Fragment {
         adapter=new LectureAdapter();
         listView.setAdapter(adapter);
 
-        helper=new MyDBHelper(getContext(),"lecture_mark.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
+        SQLiteDatabase db = getDatabase();
 
         db.execSQL("CREATE TABLE IF NOT EXISTS lecture_mark"
                 +"(code TEXT PRIMARY KEY);");
@@ -152,11 +157,15 @@ public class FragmentD extends Fragment {
             db.close();
     }
 
+    private SQLiteDatabase getDatabase() {
+        helper = new MyDBHelper(getContext(), "lecture_mark.db", null, 1);
+        return helper.getReadableDatabase();
+    }
+
     //db에 lecture 추가
     public void addLecture_DB(String code)
     {
-        helper=new MyDBHelper(getContext(),"lecture_mark.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
+        SQLiteDatabase db = getDatabase();
 
 
         //     db.execSQL("DROP TABLE IF EXISTS lecture;");
@@ -172,8 +181,7 @@ public class FragmentD extends Fragment {
     //강의 삭제
     public void deleteLecture_DB(String code)
     {
-        helper=new MyDBHelper(getContext(),"lecture_mark.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
+        SQLiteDatabase db = getDatabase();
 
         db.execSQL("DELETE FROM lecture_mark WHERE code = '" + code + "';");
         loadAdapter();//새로고침
@@ -203,17 +211,11 @@ public class FragmentD extends Fragment {
 
 
                     final Elements titles = doc.select("td.subj_class_cde");//과목코드
-                    final Elements titles2 = doc.select("td.subj_nm");//과목이름
-                    final Elements titles3 = doc.select("td.unit");//학점
-                    final Elements titles4 = doc.select("td.prof_nm");//강의교수
-                    final Elements titles5 = doc.select("td.lect_wk_tm");//강의시간
-                    final Elements titles6 = doc.select("td.lect_quota");//수강정원
-                    final Elements titles7 = doc.select("td.lect_req_cnt");//수강신청인원
 
 
+                    //해당 강의 존재
                     if (titles.hasText())
-                    {//해당 강의 존재
-
+                    {
                         //DB 리스트에 추가
                         addLecture_DB(titles.get(0).text());
 

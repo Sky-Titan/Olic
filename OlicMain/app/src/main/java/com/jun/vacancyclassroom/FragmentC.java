@@ -41,6 +41,7 @@ public class FragmentC extends Fragment {
     ArrayList<String> buildingName_list = new ArrayList<>();
     View view;
     EditText search_edittext;
+
     public FragmentC() {
         // Required empty public constructor
     }
@@ -52,11 +53,36 @@ public class FragmentC extends Fragment {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_c,container,false);
 
-        mAdView = (AdView) view.findViewById(R.id.adView4);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        mAdView.loadAd(adRequest);
+        setAdView();
+
+        setSearchEdit();
+
+        setListView();
+
+        loadList("");//초기 리스트 불러오기
+        return view;
+    }
+
+    private void setListView() {
+        adapter=new BuildingSearchAdapter();
+        listView=(ListView)view.findViewById(R.id.searchlist_c);
+        listView.setAdapter(adapter);
+
+        //리스트 뷰 클릭시 buildingActivity 띄움
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                BuildingItem item=(BuildingItem)adapter.getItem(i);
+
+                Intent intent = new Intent(getContext(), BuildingActivity.class);
+                intent.putExtra("buildingName",item.getBuildingName());
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void setSearchEdit() {
         //검색
         search_edittext=(EditText)view.findViewById(R.id.search_building);
         search_edittext.addTextChangedListener(new TextWatcher() {
@@ -71,7 +97,7 @@ public class FragmentC extends Fragment {
             public void afterTextChanged(Editable arg0) {
                 // 입력이 끝났을 때
                 String s=arg0.toString();
-                System.out.print(s);
+
                 adapter=new BuildingSearchAdapter();
                 listView.setAdapter(adapter);
                 loadList(s);
@@ -82,44 +108,43 @@ public class FragmentC extends Fragment {
                 // 입력하기 전에
             }
         });
-
-        adapter=new BuildingSearchAdapter();
-        listView=(ListView)view.findViewById(R.id.searchlist_c);
-        listView.setAdapter(adapter);
-
-        //리스트 뷰 클릭시 buildingActivity 띄움
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                BuildingItem item=(BuildingItem)adapter.getItem(i);
-                Intent intent = new Intent(getContext(),BuildingActivity.class);
-                intent.putExtra("buildingName",item.getBuildingName());
-                startActivity(intent);
-            }
-        });
-
-        loadList("");//초기 리스트 불러오기
-        return view;
     }
-    //리스트뷰 생성
+
+    private void setAdView() {
+        mAdView = (AdView) view.findViewById(R.id.adView4);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        mAdView.loadAd(adRequest);
+    }
+
+    //리스트뷰(빌딩들) 생성
     public void loadList(String searching_word){
+
         boolean isIn;
-        helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
+
+        SQLiteDatabase db = getDatabase();
+
         Cursor c = db.rawQuery("SELECT * FROM classroomlist ;", null);
 
         buildingName_list = new ArrayList<>();
+
         if(searching_word.equals(""))//전체보여주기
         {
-            while (c.moveToNext()) {
+            while (c.moveToNext())
+            {
                 isIn=false;
                 String classroom = c.getString(0);
+
                 if(classroom.equals("") || classroom.equals("-"))//이름없는 강의실이면 스킵
                     continue;
+
+                //빌딩 - 호실 파싱하여 빌딩 이름만 가져옴
                 StringTokenizer tokens = new StringTokenizer(classroom, "-");
                 String[] buildingName = new String[tokens.countTokens()];
-                System.out.println("ss : "+classroom);
+
                 buildingName[0] = tokens.nextToken();
+
                 for(int i=0;i<buildingName_list.size();i++)
                 {
                     if(buildingName_list.get(i).equals(buildingName[0]))
@@ -128,8 +153,9 @@ public class FragmentC extends Fragment {
                         break;
                     }
                 }
-                if(isIn == false) {
-                    System.out.println("token : " + buildingName[0]);
+
+                if(isIn == false)
+                {
                     buildingName_list.add(buildingName[0]);
                     adapter.addItem(buildingName[0]);
                 }
@@ -137,11 +163,14 @@ public class FragmentC extends Fragment {
         }
         else//검색어 존재할시
         {
-            while (c.moveToNext()) {
+            while (c.moveToNext())
+            {
                 isIn=false;
                 String classroom = c.getString(0);
+
                 if(classroom.equals("") || classroom.equals("-"))//이름없는 강의실이면 스킵
                     continue;
+
                 StringTokenizer tokens = new StringTokenizer(classroom, "-");
                 String[] buildingName = new String[tokens.countTokens()];
                 buildingName[0] = tokens.nextToken();
@@ -154,7 +183,9 @@ public class FragmentC extends Fragment {
                         break;
                     }
                 }
-                if(buildingName[0].toUpperCase().contains(searching_word.trim()) || buildingName[0].toLowerCase().contains(searching_word.trim()))//영어 대소문자 둘다 검사
+
+                //영어 대소문자 둘다 검사
+                if(buildingName[0].toUpperCase().contains(searching_word.trim()) || buildingName[0].toLowerCase().contains(searching_word.trim()))
                 {
                     if(isIn == false)
                     {
@@ -165,8 +196,17 @@ public class FragmentC extends Fragment {
             }
         }
         c.close();
+        closeDB(db);
+    }
+
+    private void closeDB(SQLiteDatabase db) {
         if(db!=null)
             db.close();
+    }
+
+    private SQLiteDatabase getDatabase() {
+        helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
+        return helper.getReadableDatabase();
     }
 
 }

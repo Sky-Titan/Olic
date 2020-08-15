@@ -54,41 +54,21 @@ public class FragmentA extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_a,container,false);
-        System.out.println("Fragment A 출력");
-        mAdView = (AdView) view.findViewById(R.id.adView1);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        mAdView.loadAd(adRequest);
 
-        //검색
-        search_edittext=(EditText)view.findViewById(R.id.search_classroom);
-        search_edittext.addTextChangedListener(new TextWatcher() {
+        setAdView();
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // 입력되는 텍스트에 변화가 있을 때
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable arg0) {
-                // 입력이 끝났을 때
-                String s=arg0.toString();
-                System.out.print(s);
-                adapter=new SearchAdapter();
-                listView.setAdapter(adapter);
-                loadList(s);
-                getChecked();
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // 입력하기 전에
-            }
-        });
+        setSearchEdit();
 
         adapter=new SearchAdapter();
+
+        setListView();
+
+        loadList("");//초기 리스트 불러오기
+        getChecked();//체크설정
+        return view;
+    }
+
+    private void setListView() {
         listView=(ListView)view.findViewById(R.id.searchlist_a);
         listView.setAdapter(adapter);
 
@@ -97,8 +77,7 @@ public class FragmentA extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 SearchItem item=(SearchItem)adapter.getItem(i);
 
-                helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
-                SQLiteDatabase db=helper.getReadableDatabase();
+                SQLiteDatabase db = getDatabase();
                 db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (classroom TEXT)");
                 Cursor cursor=db.rawQuery("SELECT * FROM bookmarklist WHERE classroom ='"+item.getClassroom()+"';",null);
 
@@ -115,26 +94,62 @@ public class FragmentA extends Fragment {
                     Toast.makeText(getContext(),"즐겨찾기가 해제됐습니다.",Toast.LENGTH_SHORT).show();
                 }
                 cursor.close();
-                if(db!=null)
-                    db.close();
+                closeDB(db);
             }
         });
+    }
 
-        loadList("");//초기 리스트 불러오기
-        getChecked();//체크설정
-        return view;
+    private void setSearchEdit() {
+        //검색
+        search_edittext=(EditText)view.findViewById(R.id.search_classroom);
+        search_edittext.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // 입력되는 텍스트에 변화가 있을 때
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                // 입력이 끝났을 때
+                String s=arg0.toString();
+
+                //새로 어댑터 구성
+                adapter=new SearchAdapter();
+                listView.setAdapter(adapter);
+
+                loadList(s);
+
+                getChecked();
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // 입력하기 전에
+            }
+        });
+    }
+
+    private void setAdView() {
+        mAdView = (AdView) view.findViewById(R.id.adView1);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        mAdView.loadAd(adRequest);
     }
 
     //리스트뷰 생성
     public void loadList(String searching_word){
-        helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
+
+        SQLiteDatabase db = getDatabase();
+
         Cursor c = db.rawQuery("SELECT * FROM classroomlist ;", null);
-        System.out.println("사이즈 : " + c.getCount());
+
         if(searching_word.equals(""))//전체보여주기
         {
             while (c.moveToNext()) {
-                System.out.println("classroom : "+c.getString(0));
+
                 String classroom = c.getString(0);
                 String time = c.getString(1);
                 adapter.addItem(classroom, time);
@@ -145,17 +160,29 @@ public class FragmentA extends Fragment {
             while (c.moveToNext()) {
                 String classroom = c.getString(0);
                 String time = c.getString(1);
-                if(classroom.toUpperCase().contains(searching_word.trim()) || classroom.toLowerCase().contains(searching_word.trim()))//영어 대소문자 둘다 검사
+
+                //영어 대소문자 둘다 검사
+                if(classroom.toUpperCase().contains(searching_word.trim()) || classroom.toLowerCase().contains(searching_word.trim()))
                     adapter.addItem(classroom, time);
             }
         }
         c.close();
-        if(db!=null)
+        closeDB(db);
+    }
+
+    private void closeDB(SQLiteDatabase db) {
+        if (db != null)
             db.close();
     }
+
+    private SQLiteDatabase getDatabase() {
+        helper = new MyDBHelper(getContext(), "lecture_list.db", null, 1);
+        return helper.getReadableDatabase();
+    }
+
+    //체크 되어 있는지 여부
     public void getChecked(){
-        helper=new MyDBHelper(getContext(),"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
+        SQLiteDatabase db = getDatabase();
         db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (classroom TEXT)");
 
         old_checked=new ArrayList<>();
@@ -166,21 +193,21 @@ public class FragmentA extends Fragment {
             old_checked.add(cursor.getString(0));
         }
         cursor.close();
+
         for(int i=0;i<adapter.getCount();i++){
             SearchItem item=(SearchItem)adapter.getItem(i);
             cursor=db.rawQuery("SELECT * FROM bookmarklist WHERE classroom ='"+item.getClassroom()+"';",null);
+
             //만약 즐겨찾기 db에 없다면 체크해제
             if(cursor.getCount()==0)
-            {
                 listView.setItemChecked(i,false);
-            }
-            else {//즐겨찾기에 있다면 체크
+            //즐겨찾기에 있다면 체크
+            else
                 listView.setItemChecked(i,true);
-            }
             cursor.close();
         }
-        if (db!=null)
-            db.close();
+
+        closeDB(db);
 
     }
 

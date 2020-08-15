@@ -28,6 +28,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private String DBversion;//현재 학기를 db버전으로 사용
     Myapplication myapplication ;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -36,75 +37,24 @@ public class SplashActivity extends AppCompatActivity {
 
         myapplication = (Myapplication)getApplication();
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP)
-        {
-            getWindow().setStatusBarColor(getColor(R.color.statusBar_color));
-        }
+        deleteBars();
 
+        Handler hd = new Handler();
+        hd.postDelayed(new splashhandler(), 100);
+    }
+
+    private void deleteBars() {
         //상,하단 바 제거
         int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
         int newUiOptions = uiOptions;
         newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
         newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
-
-        //애니메이션 효과 적용
-        TextView lovenu=(TextView)findViewById(R.id.olic_splash);
-        TextView appment=(TextView)findViewById(R.id.app_ment_splash);
-        final ImageView heart=(ImageView)findViewById(R.id.roomimg_splash);
-
-        Handler hd = new Handler();
-        hd.postDelayed(new splashhandler(), 100);
-
-
-
-
-    /*    View view = getLayoutInflater().from(this).inflate(R.layout.activity_splash,null);
-        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.alpha);
-        final Animation animation1 = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.blink);
-        lovenu.startAnimation(animation);
-        appment.startAnimation(animation);
-
-
-        //블링크끝나면 로그인창띄우기
-        animation1.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        //
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                heart.setImageResource(R.drawable.baseline_meeting_room_white_48);
-                heart.startAnimation(animation1);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });*/
-
     }
 
-    private class splashhandler implements Runnable{
+    //DB버전 검사 후 동기화 시작 or 바로 MainActivity로 이동
+    private class splashhandler implements Runnable
+    {
         public void run(){
 
             TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
@@ -137,14 +87,13 @@ public class SplashActivity extends AppCompatActivity {
 
             myapplication.setCurrentSemester(DBversion);
 
+            //현재 DB 버전 불러오기
             SharedPreferences sf = getSharedPreferences("sFile",MODE_PRIVATE);
             String text = sf.getString("DB","");//첫 사용인지 구분
-            System.out.println("current version : "+text);
-            if(!text.equals(DBversion))//첫사용 혹은 db업데이트일때
+
+            //첫사용 혹은 db업데이트 할때
+            if(!text.equals(DBversion))
             {
-
-                System.out.println("업데이트!");
-
                 ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
                 NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
@@ -155,12 +104,15 @@ public class SplashActivity extends AppCompatActivity {
                     db.execSQL("DROP TABLE IF EXISTS bookmarklist");
                     db.execSQL("DROP TABLE IF EXISTS lecture");
                     db.close();
+
                     //db업데이트
                     Intent intent = new Intent(SplashActivity.this, LoadingActivity.class);
                     intent.putExtra("semester",semester);
                     intent.putExtra("year",year);
                     startActivity(intent);
-                } else {
+                }
+                else
+                {
                     // 연결되지않음
                     Toast.makeText(SplashActivity.this,"시간표 동기화를 위해서 인터넷을 연결후 시도해주세요.", Toast.LENGTH_SHORT).show();
 
@@ -178,7 +130,6 @@ public class SplashActivity extends AppCompatActivity {
 
             SharedPreferences.Editor editor = sf.edit();
             editor.putString("DB",DBversion); // key, value를 이용하여 저장하는 형태
-
 
             //최종 커밋
             editor.commit();

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,9 +32,8 @@ public class UpdateDB {
     Context context;
     private ArrayList<String> url_List=new ArrayList<>();
     private ArrayList<Lecture> mysql_List=new ArrayList<>();
-    private String semester="20192";
-    private TextView textviewHtmlDocument;
-    private String htmlContentInStringFormat="";
+    private String semester="";
+
     String myJSON;
     JSONArray lectures = null;
     int cnt=0;
@@ -45,7 +45,8 @@ public class UpdateDB {
     private static final String TAG_CODE = "code";
     private static final String TAG_TITLE = "title";
     private static final String TAG_TIME = "time";
-    TextView end;
+
+    private static final String TAG = "UpdateDB";
     ProgressDialog progressDialog;
 
     public UpdateDB(ProgressDialog progressDialog)
@@ -53,11 +54,172 @@ public class UpdateDB {
         this.progressDialog = progressDialog;
     }
 
-    //계절학기
+
+    //실행
+    public void doUpdate(int year, String semester, Context context)
+    {
+        this.context = context;
+        this.semester = year+semester;
+
+        if(semester.equals("2") || semester.equals("1"))
+        {
+            //정규학기
+            add_url();
+        }
+        else//계절학기
+        {
+            add_url2();
+        }
+
+        loadDB(context);//db 불러오기
+
+        //파싱시작
+        JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
+        jsoupAsyncTask.execute();
+    }
+
+    //DB 불러옴
+    public void loadDB(Context context)
+    {
+        helper=new MyDBHelper(context,"lecture_list.db",null,1);
+        SQLiteDatabase db=helper.getReadableDatabase();
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS lecture"
+                +"(code TEXT PRIMARY KEY,title TEXT,classroom TEXT,time TEXT);");
+
+
+        if(db!=null){
+            db.close();
+        }
+    }
+
+    //강의별 정보 -> 강의실별 데이터베이스로 재구성
+    public void MakingClassroomList()
+    {
+        helper=new MyDBHelper(context,"lecture_list.db",null,1);
+        SQLiteDatabase db=helper.getReadableDatabase();
+
+        Cursor c= db.rawQuery("SELECT * FROM lecture",null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS classroomlist (classroom TEXT PRIMARY KEY,time TEXT)");
+
+        while(c.moveToNext())
+        {
+            String classroom=c.getString(2);
+            String time=c.getString(3);
+
+            //해당 강의실 정보 불러옴
+            Cursor c2=db.rawQuery("SELECT * FROM classroomlist WHERE classroom='"+classroom+"'",null);
+
+            int j=0;
+            while(c2.moveToNext()){
+                j++;
+            }
+
+            c2.moveToFirst();
+
+            if(j==0)//classroom이 안들어가있으므로 바로 insert문 사용
+            {
+                db.execSQL("INSERT INTO classroomlist (classroom,time) values('"+classroom+"','"+time+"');");
+            }
+            else
+            {
+                //이미 들어가 있으므로 string에 추가만
+                String time2=c2.getString(1);
+                time2+=" "+time;
+
+                db.execSQL("UPDATE classroomlist SET time='"+time2+"' WHERE classroom='"+classroom+"';");
+            }
+        }
+
+        if(db!=null)
+            db.close();
+    }
+
+    //웹 크롤링
+    private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+
+                helper=new MyDBHelper(context,"lecture_list.db",null,1);
+                SQLiteDatabase db=helper.getReadableDatabase();
+
+                for(int i=0;i<url_List.size();i++) {//url 리스트 만큼 반복
+                    Document doc = Jsoup.connect(url_List.get(i)).get();
+
+                    Log.i(TAG,(i + 1) + "번째 페이지");
+
+                    //테스트1
+                    Elements titles = doc.select("td.th4");//과목코드
+                    Elements titles2 = doc.select("td.th5");//과목이름
+                    Elements titles3 = doc.select("td.th11");//강의실
+                    Elements titles4 = doc.select("td.th17");//강의시간
+
+                    for (int j = 0; j < titles.size(); j++)
+                    {
+                        lectures_size++;
+
+                        db.execSQL("REPLACE INTO lecture (code,title,classroom,time) VALUES('" + titles.get(j).text().trim() + "','" + titles2.get(j).text().trim()
+                                + "','" + titles3.get(j).text().trim() + "','" + titles4.get(j).text().trim() + "')");
+                    }
+                }
+                if(db!=null){
+                    db.close();
+                }
+
+                //강의실 데이터베이스 생성
+                MakingClassroomList();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                SharedPreferences sf = context.getSharedPreferences("sFile",Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sf.edit();
+                editor.putString("DB",""); // exception 발생되서 업데이트 중간에 끊기면 버전 초기화시켜버림
+
+
+                //최종 커밋
+                editor.commit();
+
+                //로딩 액티비티 닫음
+                LoadingActivity loadingActivity = (LoadingActivity) LoadingActivity.activity;
+                loadingActivity.finish();
+
+                return  null;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            //   textviewHtmlDocument.setText(htmlContentInStringFormat);
+            progressDialog.dismiss();
+            progressDialog.cancel(); //메모리 누수방지지
+
+            //mainActivity로
+            Intent intent = new Intent(context, MainActivity.class);
+
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            context.startActivity(intent);
+
+            //로딩 액티비티 닫음
+            LoadingActivity loadingActivity = (LoadingActivity) LoadingActivity.activity;
+            loadingActivity.finish();
+
+        }
+    }
+
+    //계절학기 링크
     public void add_url2(){
         url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_gubun=2");
     }
 
+    //정규학기 링크
     public void add_url(){
 
         //첨성인기초 - 독서와토론
@@ -589,235 +751,5 @@ public class UpdateDB {
         url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde=1Q01&sub=1P&search_open_yr_trm="+semester);
 
 
-    }
-
-    public void loadDB(Context context){
-        helper=new MyDBHelper(context,"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
-
-
-        //     db.execSQL("DROP TABLE IF EXISTS lecture;");
-        db.execSQL("CREATE TABLE IF NOT EXISTS lecture"
-                +"(code TEXT PRIMARY KEY,title TEXT,classroom TEXT,time TEXT);");
-    /*    Cursor c= db.rawQuery("SELECT * FROM lecture",null);
-
-        int i=0;
-        while(c.moveToNext()){
-         c.getString(0);
-        }*/
-
-        if(db!=null){
-            db.close();
-        }
-
-    }
-    public void MakingClassroomList(){
-        helper=new MyDBHelper(context,"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
-        Cursor c= db.rawQuery("SELECT * FROM lecture",null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS classroomlist (classroom TEXT PRIMARY KEY,time TEXT)");
-        System.out.print("크기:");
-        int i=0;
-        while(c.moveToNext()){
-            System.out.println("계속");
-            String classroom=c.getString(2);
-            String time=c.getString(3);
-            Cursor c2=db.rawQuery("SELECT * FROM classroomlist WHERE classroom='"+classroom+"'",null);
-            int j=0;
-            while(c2.moveToNext()){
-                j++;
-            }
-            c2.moveToFirst();
-            if(j==0)//classroom이 안들어가있으므로 바로 insert 문사용
-            {
-                db.execSQL("INSERT INTO classroomlist (classroom,time) values('"+classroom+"','"+time+"');");
-            }
-            else {//이미 들어가 있으므로 string에 추가만
-                String time2=c2.getString(1);
-                time2+=" "+time;
-                db.execSQL("UPDATE classroomlist SET time='"+time2+"' WHERE classroom='"+classroom+"';");
-            }
-            i++;
-        }
-        System.out.print("진짜끗");
-        if(db!=null)
-            db.close();
-    }
-
-    private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-
-                helper=new MyDBHelper(context,"lecture_list.db",null,1);
-                SQLiteDatabase db=helper.getReadableDatabase();
-
-                //Cursor c= db.rawQuery("SELECT * FROM lecture",null);
-                System.out.println("총 개수 : "+url_List.size());
-                for(int i=0;i<url_List.size();i++) {//url 리스트 만큼 반복
-                    Document doc = Jsoup.connect(url_List.get(i)).get();
-                    System.out.println( (i+1) +"번째 페이지");
-
-                    //테스트1
-                    Elements titles = doc.select("td.th4");//과목코드
-                    Elements titles2 = doc.select("td.th5");//과목이름
-                    Elements titles3 = doc.select("td.th11");//강의실
-                    Elements titles4 = doc.select("td.th17");//강의시간
-
-
-                    System.out.println("-------------------------------------------------------------");
-                    for (int j = 0; j < titles.size(); j++) {
-                        //System.out.println("title: " + e.text());
-                        lectures_size++;
-                        //progressDialog.setMessage(lectures_size+"번째 과목 동기화 중입니다.");
-                        System.out.println("과목이름 : "+titles2.get(j).text().trim());
-                        //htmlContentInStringFormat += e.text().trim() + "\n";
-                        db.execSQL("REPLACE INTO lecture (code,title,classroom,time) VALUES('" + titles.get(j).text().trim() + "','" + titles2.get(j).text().trim()
-                                + "','" + titles3.get(j).text().trim() + "','" + titles4.get(j).text().trim() + "')");
-                    }
-
-                    System.out.println("-------------------------------------------------------------");
-
-                }
-                if(db!=null){
-                    db.close();
-                }
-                System.out.println("끄읏");
-                MakingClassroomList();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                SharedPreferences sf = context.getSharedPreferences("sFile",Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sf.edit();
-                editor.putString("DB",""); // exception 발생되서 업데이트 중간에 끊기면 버전 초기화시켜버림
-
-
-                //최종 커밋
-                editor.commit();
-
-                LoadingActivity loadingActivity = (LoadingActivity) LoadingActivity.activity;
-                loadingActivity.finish();
-
-                return  null;
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            //   textviewHtmlDocument.setText(htmlContentInStringFormat);
-            progressDialog.dismiss();
-            progressDialog.cancel(); //메모리 누수방지지
-
-            //mainActivity로
-            Intent intent = new Intent(context, MainActivity.class);
-
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            context.startActivity(intent);
-            LoadingActivity loadingActivity = (LoadingActivity) LoadingActivity.activity;
-            loadingActivity.finish();
-
-        }
-    }
-
-    public void getData(String url){
-        class GetDataJSON extends AsyncTask<String, Void, String> {
-            @Override
-            protected String doInBackground(String... params){
-                String uri = params[0];
-                BufferedReader bufferedReader = null;
-                try{
-                    URL url = new URL(uri);
-                    HttpURLConnection con = (HttpURLConnection)url.openConnection();
-                    StringBuilder sb = new StringBuilder();
-
-                    bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
-                    String json;
-                    while((json = bufferedReader.readLine()) != null){
-                        sb.append(json + "\n");
-                    }
-
-                    return sb.toString().trim();
-                }catch (Exception e){
-                    return null;
-                }
-            }
-            @Override
-            protected void onPostExecute(String result){
-                myJSON = result;
-                showList();
-                helper=new MyDBHelper(context,"lecture_list.db",null,1);
-                SQLiteDatabase db=helper.getReadableDatabase();
-
-
-                Cursor cursor=db.rawQuery("SELECT * FROM lecture",null);
-                int i=0;
-                while(cursor.moveToNext()){
-                    String code=cursor.getString(0);
-                    if(!code.equals(mysql_List.get(i).getCode()))
-                    {
-                        System.out.println(i+"번째 "+code+" "+cursor.getString(1));
-                    }
-                    i++;
-                }
-                if(db!=null)
-                    db.close();
-            }
-        }
-        GetDataJSON g = new GetDataJSON();
-        g.execute(url);
-    }
-    protected void showList(){
-        try{
-            JSONObject jsonObj = new JSONObject(myJSON);
-            lectures = jsonObj.getJSONArray(TAG_RESULTS);
-
-
-            for(int i =0;i< lectures.length();i++){
-                JSONObject c = lectures.getJSONObject(i);
-                String code = c.getString(TAG_CODE);
-                String title = c.getString(TAG_TITLE);
-                String classroom = c.getString(TAG_CLASSROOM);
-                String time = c.getString(TAG_TIME);
-                mysql_List.add(new Lecture(code,title,classroom,time));
-            }
-        }catch (JSONException e){
-            e.printStackTrace();
-        }
-    }
-    //실행
-    public void doUpdate(int year, String semester, Context context)
-    {
-        this.context = context;
-        this.semester = year+semester;
-        if(semester.equals("2") || semester.equals("1"))
-        {
-            System.out.println("정규학기");
-            add_url(); //url들 배열에 추가
-        }
-        else//계절학기
-        {
-            System.out.println("계절학기");
-            add_url2();
-        }
-
-        loadDB(context);//db 불러오기
-
-
-        //파싱시작
-        System.out.println( (cnt+1) +"번째 파싱");
-        JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-
-            jsoupAsyncTask.execute();
-
-
-        cnt++;
     }
 }

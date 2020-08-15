@@ -40,10 +40,6 @@ public class BuildingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_building);
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP)
-        {
-            getWindow().setStatusBarColor(getColor(R.color.statusBar_color));
-        }
 
         mAdView = (AdView) findViewById(R.id.adView5);
         AdRequest adRequest = new AdRequest.Builder()
