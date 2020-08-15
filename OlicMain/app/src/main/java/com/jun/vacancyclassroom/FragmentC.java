@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+
+import androidx.fragment.app.Fragment;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -14,15 +16,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.adapter.BuildingSearchAdapter;
-import com.jun.vacancyclassroom.adapter.SearchAdapter;
 import com.jun.vacancyclassroom.item.BuildingItem;
-import com.jun.vacancyclassroom.item.SearchItem;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;

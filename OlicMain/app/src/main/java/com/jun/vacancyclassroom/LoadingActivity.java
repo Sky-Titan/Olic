@@ -7,10 +7,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
+
+
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vacancyclassroom.R;
 

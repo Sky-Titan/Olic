@@ -1,13 +1,14 @@
 package com.jun.vacancyclassroom;
 
 
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,10 +63,14 @@ public class FragmentB extends Fragment {
         super.onResume();
 
         //화면 돌아올 때 북마크 리스트 새로 구성
-        adapter=new BookMarkAdapter();
-        listView.setAdapter(adapter);
-        checkedlist=new ArrayList<String>();
-        loadList();
+        if(listView!=null)
+        {
+            adapter=new BookMarkAdapter();
+
+            listView.setAdapter(adapter);
+            checkedlist=new ArrayList<String>();
+            loadList();
+        }
     }
 
     @Override

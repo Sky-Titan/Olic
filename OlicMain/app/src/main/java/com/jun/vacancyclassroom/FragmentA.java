@@ -4,7 +4,8 @@ package com.jun.vacancyclassroom;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;

@@ -8,18 +8,16 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+
+
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.TextView;
+
 import android.widget.Toast;
 
-import com.example.vacancyclassroom.R;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.ads.MobileAds;
+import com.example.vacancyclassroom.R;
 
 import java.util.Calendar;
 import java.util.TimeZone;

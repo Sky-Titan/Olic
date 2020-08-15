@@ -6,20 +6,24 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
+
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.jun.vacancyclassroom.adapter.ViewPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     FragmentC fragment_C;
     FragmentD fragment_D;
 
-    private NonSwipeViewPager mViewPager;
+    private ViewPager2 mViewPager;
 
     private static final String TAG = "MainActivity";
 
@@ -54,32 +58,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setViewPager(final BottomNavigationView navigation) {
-        mViewPager=(NonSwipeViewPager)findViewById(R.id.fragment_container);
-        mViewPager.setPagingDisabled();//터치 스와이프 못하게 하기
+        mViewPager=(ViewPager2) findViewById(R.id.fragment_container);
+        mViewPager.setUserInputEnabled(false);//터치 스와이프 못하게 하기
 
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
 
-            }
-
-            @Override
-            public void onPageSelected(int i) {
-                if(prevMenuItem!=null){
-                    prevMenuItem.setChecked(false);
-                }
-                else {
-                    navigation.getMenu().getItem(0).setChecked(false);
-                }
-                navigation.getMenu().getItem(i).setChecked(true);
-                prevMenuItem=navigation.getMenu().getItem(i);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-
-            }
-        });
 
         setupViewPagerAdapter(mViewPager);
     }
@@ -198,9 +180,9 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void setupViewPagerAdapter(ViewPager viewPager) {
+    private void setupViewPagerAdapter(ViewPager2 viewPager) {
 
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), getLifecycle());
         fragment_A = new FragmentA();
         fragment_B = new FragmentB();
         fragment_C = new FragmentC();

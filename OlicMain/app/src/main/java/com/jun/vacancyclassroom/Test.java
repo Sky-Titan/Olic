@@ -4,9 +4,11 @@ import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vacancyclassroom.R;
 import com.jun.vacancyclassroom.item.Lecture;
