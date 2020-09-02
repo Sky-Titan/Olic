@@ -1,8 +1,8 @@
-package com.jun.vacancyclassroom;
+package com.jun.vacancyclassroom.activity;
 
-import android.content.DialogInterface;
+
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
+
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 
@@ -24,20 +23,24 @@ import android.widget.Toast;
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.jun.vacancyclassroom.fragment.*;
+
+import com.jun.vacancyclassroom.Myapplication;
 import com.jun.vacancyclassroom.adapter.ViewPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
     //메인화면구성
-    MenuItem prevMenuItem;
-    FragmentA fragment_A;
-    FragmentB fragment_B;
-    FragmentC fragment_C;
-    FragmentD fragment_D;
+
+    LectureRoomListFragment fragment_lectureRoomList;
+    BookmarkListFragment fragment_bookmarkList;
+    BuildingListFragment fragment_buildingList;
+    LectureSearchFragment fragment_lectureSearch;
 
     private ViewPager2 mViewPager;
 
     private static final String TAG = "MainActivity";
+
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -51,17 +54,15 @@ public class MainActivity extends AppCompatActivity {
         MobileAds.initialize(this, "ca-app-pub-7245602797811817~6821353940");
 
 
-        final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        setViewPager(navigation);
+        setViewPager();
     }
 
-    private void setViewPager(final BottomNavigationView navigation) {
+    private void setViewPager() {
         mViewPager=(ViewPager2) findViewById(R.id.fragment_container);
         mViewPager.setUserInputEnabled(false);//터치 스와이프 못하게 하기
-
-
 
         setupViewPagerAdapter(mViewPager);
     }
@@ -85,49 +86,45 @@ public class MainActivity extends AppCompatActivity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("시간표 동기화");
                     builder.setMessage("시간표를 새로 동기화 하시겠습니까?");
-                    builder.setPositiveButton("동기화",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(getApplicationContext(),"시간표를 새로 동기화합니다.",Toast.LENGTH_LONG).show();
+                    builder.setPositiveButton("동기화",(dialog, which) -> {
 
-                                    ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-                                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                        Toast.makeText(getApplicationContext(),"시간표를 새로 동기화합니다.",Toast.LENGTH_LONG).show();
 
-                                    //네트워크 연결되어있으면
-                                    if(networkInfo != null && networkInfo.isConnected())
-                                    {
-                                        //db업데이트
-                                        dropTables();
+                        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-                                        //동기화
-                                        Myapplication myapplication = (Myapplication) getApplication();
+                        //네트워크 연결되어있으면
+                        if(networkInfo != null && networkInfo.isConnected())
+                        {
+                            //db업데이트
 
-                                        String version = myapplication.getCurrentSemester();
-                                        int year = Integer.parseInt(version.substring(0,4));
-                                        String semester = version.substring(4,5);
+                            //동기화
+                            Myapplication myapplication = (Myapplication) getApplication();
 
-                                        Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
-                                        intent.putExtra("semester",semester);
-                                        intent.putExtra("year",year);
-                                        startActivity(intent);
+                            String version = myapplication.getCurrentSemester();
+                            int year = Integer.parseInt(version.substring(0,4));
+                            String semester = version.substring(4,5);
 
-                                        finish();
-                                    }
-                                    else
-                                    {
-                                        Toast.makeText(MainActivity.this,"시간표 동기화를 위해서 인터넷을 연결후 시도해주세요.", Toast.LENGTH_SHORT).show();
-                                        return;
-                                    }
+                            Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
+                            intent.putExtra("semester",semester);
+                            intent.putExtra("year",year);
+                            startActivity(intent);
 
-                                }
-                            });
+                            finish();
+                        }
+                        else
+                        {
+                             Toast.makeText(MainActivity.this,"시간표 동기화를 위해서 인터넷을 연결후 시도해주세요.", Toast.LENGTH_SHORT).show();
+                             return;
+                        }
+                    });
 
                     builder.setNegativeButton("취소", null);
                     builder.show();
                 }
                 else//수강신청현황
                 {
-                    fragment_D.loadAdapter();//새로고침
+                    fragment_lectureSearch.loadAdapter();//새로고침
                 }
 
                 return true;
@@ -136,14 +133,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void dropTables() {
-        MyDBHelper helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
-        db.execSQL("DROP TABLE IF EXISTS classroomlist");
-        db.execSQL("DROP TABLE IF EXISTS bookmarklist");
-        db.execSQL("DROP TABLE IF EXISTS lecture");
-        db.close();
-    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -157,22 +146,22 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     mViewPager.setCurrentItem(0);
-                    fragment_A.onResume();
+                    fragment_lectureRoomList.onResume();
                     return true ;
 
                 case R.id.navigation_dashboard:
                     mViewPager.setCurrentItem(1);
-                    fragment_B.onResume();
+                    fragment_bookmarkList.onResume();
                     return true;
 
                 case R.id.navigation_buildingSearch:
                     mViewPager.setCurrentItem(2);
-                    fragment_C.onResume();
+                    fragment_buildingList.onResume();
                     return true;
 
                 case R.id.navigation_lectureSearch:
                     mViewPager.setCurrentItem(3);
-                    fragment_D.onResume();
+                    fragment_lectureSearch.onResume();
                     return true;
             }
 
@@ -183,15 +172,15 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPagerAdapter(ViewPager2 viewPager) {
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), getLifecycle());
-        fragment_A = new FragmentA();
-        fragment_B = new FragmentB();
-        fragment_C = new FragmentC();
-        fragment_D = new FragmentD();
+        fragment_lectureRoomList = new LectureRoomListFragment();
+        fragment_bookmarkList = new BookmarkListFragment();
+        fragment_buildingList = new BuildingListFragment();
+        fragment_lectureSearch = new LectureSearchFragment();
 
-        viewPagerAdapter.addFragment(fragment_A);
-        viewPagerAdapter.addFragment(fragment_B);
-        viewPagerAdapter.addFragment(fragment_C);
-        viewPagerAdapter.addFragment(fragment_D);
+        viewPagerAdapter.addFragment(fragment_lectureRoomList);
+        viewPagerAdapter.addFragment(fragment_bookmarkList);
+        viewPagerAdapter.addFragment(fragment_buildingList);
+        viewPagerAdapter.addFragment(fragment_lectureSearch);
 
         viewPager.setAdapter(viewPagerAdapter);
     }

@@ -5,7 +5,7 @@
     android:background="@color/skyblue"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.jun.vacancyclassroom.SplashActivity">
+    tools:context="com.jun.vacancyclassroom.activity.SplashActivity">
 
     <TextView
         android:id="@+id/olic_splash"

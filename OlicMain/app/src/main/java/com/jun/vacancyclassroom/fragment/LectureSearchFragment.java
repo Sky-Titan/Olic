@@ -1,4 +1,4 @@
-package com.jun.vacancyclassroom;
+package com.jun.vacancyclassroom.fragment;
 
 
 import android.app.AlertDialog;
@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vacancyclassroom.R;
 import com.jun.vacancyclassroom.adapter.LectureAdapter;
+import com.jun.vacancyclassroom.database.MyDBHelper;
 import com.jun.vacancyclassroom.item.Lecture;
 
 import org.jsoup.Jsoup;
@@ -31,10 +32,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class FragmentD extends Fragment {
+public class LectureSearchFragment extends Fragment {
 
     private MyDBHelper helper;
     View view;
@@ -50,7 +48,7 @@ public class FragmentD extends Fragment {
     LectureAdapter adapter;
     ListView listView;
 
-    public FragmentD() {
+    public LectureSearchFragment() {
         // Required empty public constructor
     }
 
@@ -59,7 +57,7 @@ public class FragmentD extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view=inflater.inflate(R.layout.fragment_d,container,false);
+        view = inflater.inflate(R.layout.fragment_lecturesearch,container,false);
 
 
         setListView();

@@ -1,42 +1,28 @@
-package com.jun.vacancyclassroom;
+package com.jun.vacancyclassroom.database;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.jun.vacancyclassroom.item.Lecture;
+import androidx.annotation.WorkerThread;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
-public class UpdateDB {
+public class DatabaseLibrary {
+
     MyDBHelper helper;
     Context context;
     private ArrayList<String> url_List=new ArrayList<>();
-    private ArrayList<Lecture> mysql_List=new ArrayList<>();
+
     private String semester="";
 
-    String myJSON;
-    JSONArray lectures = null;
-    int cnt=0;
 
     int lectures_size=0;
 
@@ -49,66 +35,149 @@ public class UpdateDB {
     private static final String TAG = "UpdateDB";
     ProgressDialog progressDialog;
 
-    public UpdateDB(ProgressDialog progressDialog)
-    {
-        this.progressDialog = progressDialog;
+    private static DatabaseLibrary databaseLibrary;
+
+    private SQLiteDatabase db;
+
+
+    private DatabaseLibrary(Context context){
+        helper=new MyDBHelper(context,"lecture_list.db",null,1);
+        db = helper.getWritableDatabase();
+
+        createTables();
     }
 
+    public void deleteAllRecords() {
+        dropTables();
+        createTables();
+    }
+
+    public void dropTables()
+    {
+        db.execSQL("DROP TABLE IF EXISTS lectureRoomList");
+        db.execSQL("DROP TABLE IF EXISTS bookmarklist");
+        db.execSQL("DROP TABLE IF EXISTS lecture");
+    }
+
+    public void createTables()
+    {
+        db.execSQL("CREATE TABLE IF NOT EXISTS lecture"
+                +"(lectureCode TEXT PRIMARY KEY, lectureName TEXT, lectureCredit TEXT, professor TEXT, quota TEXT, peopleNumber TEXT, lectureRoom TEXT, lectureTime TEXT);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS lectureRoomList (lectureRoom TEXT PRIMARY KEY, time TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (lectureRoom TEXT, FOREIGN KEY(lectureRoom) REFERENCES lecture(lectureRoom))");
+    }
+
+    public static DatabaseLibrary getInstance(Context context)
+    {
+        if(databaseLibrary == null)
+            databaseLibrary = new DatabaseLibrary(context);
+        return databaseLibrary;
+    }
+
+    public Cursor selectLectureRoomList(String lectureRoom)
+    {
+        return db.rawQuery("SELECT * FROM lectureRoomList WHERE lectureRoom = '"+lectureRoom+"';", null);
+    }
+
+    public Cursor selectLectureRoomList()
+    {
+        return db.rawQuery("SELECT * FROM lectureRoomList;", null);
+    }
+
+    public Cursor selectBookmarkList()
+    {
+        return db.rawQuery("SELECT * FROM bookmarklist;",null);
+    }
+
+    public Cursor selectBookmarkList(String lectureRoom)
+    {
+        return db.rawQuery("SELECT * FROM bookmarklist WHERE lectureRoom ='"+lectureRoom+"';",null);
+    }
+
+    public void insertBookmarkList(String lectureRoom)
+    {
+        db.execSQL("INSERT INTO bookmarklist VALUES ('"+lectureRoom+"');");
+    }
+
+    public void deleteBookmarkList(String lectureRoom)
+    {
+        db.execSQL("DELETE FROM bookmarklist WHERE lectureRoom = '"+lectureRoom+"';");
+    }
 
     //실행
-    public void doUpdate(int year, String semester, Context context)
+    @WorkerThread
+    public boolean doUpdate(int year, String semester)
     {
-        this.context = context;
+        deleteAllRecords();
+
         this.semester = year+semester;
 
+        //정규학기
         if(semester.equals("2") || semester.equals("1"))
-        {
-            //정규학기
             add_url();
-        }
         else//계절학기
-        {
             add_url2();
+
+        try
+        {
+            for(int i=0;i<url_List.size();i++) {//url 리스트 만큼 반복
+                Document doc = Jsoup.connect(url_List.get(i)).get();
+
+                Log.i(TAG,(i + 1) + "번째 페이지");
+
+                //테스트1
+                Elements lectureCode = doc.select("td.th4");//과목코드
+                Elements lectureName = doc.select("td.th5");//과목이름
+                Elements lectureCredit = doc.select("td.th6");//이수학점
+                Elements professor = doc.select("td.th9");//담당 교수
+                Elements quota = doc.select("td.th12");//수강정원
+                Elements peopleNumber = doc.select("td.th13");//신청인원
+                Elements lectureRoom = doc.select("td.th11");//강의실
+                Elements lectureTime = doc.select("td.th17");//강의시간
+
+                for (int j = 0; j < lectureCode.size(); j++)
+                {
+                    lectures_size++;
+                    //(lectureCode TEXT PRIMARY KEY, lectureName TEXT, lectureCredit TEXT, professor TEXT, quota TEXT, peopleNumber TEXT, lectureRoom TEXT, lectureTime TEXT)
+                    db.execSQL("REPLACE INTO lecture VALUES('" + lectureCode.get(j).text().trim() + "','" + lectureName.get(j).text().trim()
+                            + "','"+lectureCredit.get(j).text().trim()+"','" + professor.get(j).text().trim()+"','" + quota.get(j).text().trim()+"','"
+                            + peopleNumber.get(j).text().trim() +"','" +lectureRoom.get(j).text().trim() + "','" + lectureTime.get(j).text().trim() + "')");
+                }
+            }
+
+            //강의실 데이터베이스 생성
+            MakinglectureRoomList();
+            return true;
+
         }
+        catch (IOException e) {
 
-        loadDB(context);//db 불러오기
-
-        //파싱시작
-        JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-        jsoupAsyncTask.execute();
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    //DB 불러옴
-    public void loadDB(Context context)
+
+    public void closeDB()
     {
-        helper=new MyDBHelper(context,"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS lecture"
-                +"(code TEXT PRIMARY KEY,title TEXT,classroom TEXT,time TEXT);");
-
-
         if(db!=null){
             db.close();
         }
     }
 
     //강의별 정보 -> 강의실별 데이터베이스로 재구성
-    public void MakingClassroomList()
+    public void MakinglectureRoomList()
     {
-        helper=new MyDBHelper(context,"lecture_list.db",null,1);
-        SQLiteDatabase db=helper.getReadableDatabase();
-
-        Cursor c= db.rawQuery("SELECT * FROM lecture",null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS classroomlist (classroom TEXT PRIMARY KEY,time TEXT)");
+        Cursor c= db.rawQuery("SELECT lectureRoom, lectureTime FROM lecture",null);
 
         while(c.moveToNext())
         {
-            String classroom=c.getString(2);
-            String time=c.getString(3);
+            String lectureRoom = c.getString(0);
+            String time = c.getString(1);
+            Log.d(TAG, lectureRoom +" "+time);
 
             //해당 강의실 정보 불러옴
-            Cursor c2=db.rawQuery("SELECT * FROM classroomlist WHERE classroom='"+classroom+"'",null);
+            Cursor c2 = selectLectureRoomList(lectureRoom);
 
             int j=0;
             while(c2.moveToNext()){
@@ -119,7 +188,7 @@ public class UpdateDB {
 
             if(j==0)//classroom이 안들어가있으므로 바로 insert문 사용
             {
-                db.execSQL("INSERT INTO classroomlist (classroom,time) values('"+classroom+"','"+time+"');");
+                db.execSQL("INSERT INTO lectureRoomList values('"+lectureRoom+"','"+time+"');");
             }
             else
             {
@@ -127,100 +196,19 @@ public class UpdateDB {
                 String time2=c2.getString(1);
                 time2+=" "+time;
 
-                db.execSQL("UPDATE classroomlist SET time='"+time2+"' WHERE classroom='"+classroom+"';");
+                db.execSQL("UPDATE lectureRoomList SET time='"+time2+"' WHERE lectureRoom='"+lectureRoom+"';");
             }
         }
 
-        if(db!=null)
-            db.close();
-    }
-
-    //웹 크롤링
-    private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-
-                helper=new MyDBHelper(context,"lecture_list.db",null,1);
-                SQLiteDatabase db=helper.getReadableDatabase();
-
-                for(int i=0;i<url_List.size();i++) {//url 리스트 만큼 반복
-                    Document doc = Jsoup.connect(url_List.get(i)).get();
-
-                    Log.i(TAG,(i + 1) + "번째 페이지");
-
-                    //테스트1
-                    Elements titles = doc.select("td.th4");//과목코드
-                    Elements titles2 = doc.select("td.th5");//과목이름
-                    Elements titles3 = doc.select("td.th11");//강의실
-                    Elements titles4 = doc.select("td.th17");//강의시간
-
-                    for (int j = 0; j < titles.size(); j++)
-                    {
-                        lectures_size++;
-
-                        db.execSQL("REPLACE INTO lecture (code,title,classroom,time) VALUES('" + titles.get(j).text().trim() + "','" + titles2.get(j).text().trim()
-                                + "','" + titles3.get(j).text().trim() + "','" + titles4.get(j).text().trim() + "')");
-                    }
-                }
-                if(db!=null){
-                    db.close();
-                }
-
-                //강의실 데이터베이스 생성
-                MakingClassroomList();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                SharedPreferences sf = context.getSharedPreferences("sFile",Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sf.edit();
-                editor.putString("DB",""); // exception 발생되서 업데이트 중간에 끊기면 버전 초기화시켜버림
-
-
-                //최종 커밋
-                editor.commit();
-
-                //로딩 액티비티 닫음
-                LoadingActivity loadingActivity = (LoadingActivity) LoadingActivity.activity;
-                loadingActivity.finish();
-
-                return  null;
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            //   textviewHtmlDocument.setText(htmlContentInStringFormat);
-            progressDialog.dismiss();
-            progressDialog.cancel(); //메모리 누수방지지
-
-            //mainActivity로
-            Intent intent = new Intent(context, MainActivity.class);
-
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            context.startActivity(intent);
-
-            //로딩 액티비티 닫음
-            LoadingActivity loadingActivity = (LoadingActivity) LoadingActivity.activity;
-            loadingActivity.finish();
-
-        }
     }
 
     //계절학기 링크
-    public void add_url2(){
+    private void add_url2(){
         url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_gubun=2");
     }
 
     //정규학기 링크
-    public void add_url(){
+    private void add_url(){
 
         //첨성인기초 - 독서와토론
         url_List.add("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_subj_area_cde=1A01&search_open_yr_trm="+semester);

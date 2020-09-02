@@ -1,12 +1,9 @@
-package com.jun.vacancyclassroom;
+package com.jun.vacancyclassroom.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Handler;
 
 
@@ -18,6 +15,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vacancyclassroom.R;
+import com.jun.vacancyclassroom.database.DatabaseLibrary;
+import com.jun.vacancyclassroom.Myapplication;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -27,11 +26,15 @@ public class SplashActivity extends AppCompatActivity {
     private String DBversion;//현재 학기를 db버전으로 사용
     Myapplication myapplication ;
 
+    private DatabaseLibrary databaseLibrary;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        databaseLibrary = DatabaseLibrary.getInstance(null);
 
         myapplication = (Myapplication)getApplication();
 
@@ -96,12 +99,7 @@ public class SplashActivity extends AppCompatActivity {
                 NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
                 if(networkInfo != null && networkInfo.isConnected()) {
-                    MyDBHelper helper=new MyDBHelper(getApplicationContext(),"lecture_list.db",null,1);
-                    SQLiteDatabase db=helper.getReadableDatabase();
-                    db.execSQL("DROP TABLE IF EXISTS classroomlist");
-                    db.execSQL("DROP TABLE IF EXISTS bookmarklist");
-                    db.execSQL("DROP TABLE IF EXISTS lecture");
-                    db.close();
+                    databaseLibrary.deleteAllRecords();
 
                     //db업데이트
                     Intent intent = new Intent(SplashActivity.this, LoadingActivity.class);

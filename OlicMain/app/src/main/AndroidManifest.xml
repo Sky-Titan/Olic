@@ -14,10 +14,10 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.jun.vacancyclassroom.LoadingActivity"></activity>
-        <activity android:name="com.jun.vacancyclassroom.BuildingActivity" />
+        <activity android:name="com.jun.vacancyclassroom.activity.LoadingActivity"></activity>
+        <activity android:name="com.jun.vacancyclassroom.activity.BuildingActivity" />
         <activity
-            android:name="com.jun.vacancyclassroom.TimeTableActivity"
+            android:name="com.jun.vacancyclassroom.activity.TimeTableActivity"
             android:screenOrientation="portrait" />
 
         <meta-data
@@ -25,7 +25,7 @@
             android:value="ca-app-pub-7245602797811817~6821353940" />
 
         <activity
-            android:name="com.jun.vacancyclassroom.SplashActivity"
+            android:name="com.jun.vacancyclassroom.activity.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme_notitle">
             <intent-filter>
@@ -38,7 +38,7 @@
             android:name="com.jun.vacancyclassroom.Test"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.jun.vacancyclassroom.MainActivity"
+            android:name="com.jun.vacancyclassroom.activity.MainActivity"
             android:screenOrientation="portrait" />
     </application>
 
