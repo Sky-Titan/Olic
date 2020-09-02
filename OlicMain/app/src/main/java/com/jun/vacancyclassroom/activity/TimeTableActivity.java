@@ -77,25 +77,6 @@ public class TimeTableActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Boolean>()
         {
             @Override
-            protected void onPostExecute(Boolean aBoolean) {
-                super.onPostExecute(aBoolean);
-
-                //즐겨찾기 해제
-                bookmark = (Button)findViewById(R.id.bookmarkButton_timetable);
-
-                if(aBoolean)
-                {
-                    isBookMarked = false;
-                    bookmark.setText("즐겨찾기 추가");
-                }
-                else
-                {
-                    isBookMarked = true;
-                    bookmark.setText("즐겨찾기 해제");
-                }
-            }
-
-            @Override
             protected Boolean doInBackground(Void... voids) {
                 Cursor c = databaseLibrary.selectBookmarkList(classroom);
 
@@ -110,23 +91,44 @@ public class TimeTableActivity extends AppCompatActivity {
                     return true;
                 }
             }
-        }.execute();
 
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
 
-        //즐겨찾기 버튼 클릭 리스너
-        bookmark.setOnClickListener(view -> {
-                if(isBookMarked == true) {
+                //즐겨찾기 해제
+                bookmark = (Button)findViewById(R.id.bookmarkButton_timetable);
 
-                    new Thread(() -> databaseLibrary.deleteBookmarkList(classroom)).start();
-                    Toast.makeText(getApplicationContext(), "즐겨찾기가 해제됐습니다.", Toast.LENGTH_SHORT).show();
+                if(!aBoolean)
+                {
+                    isBookMarked = false;
+                    bookmark.setText("즐겨찾기 추가");
                 }
                 else
                 {
-                    new Thread(() -> databaseLibrary.insertBookmarkList(classroom)).start();
-                    Toast.makeText(getApplicationContext(), "즐겨찾기에 추가됐습니다.", Toast.LENGTH_SHORT).show();
+                    isBookMarked = true;
+                    bookmark.setText("즐겨찾기 해제");
                 }
-                finish();
-        });
+
+                //즐겨찾기 버튼 클릭 리스너
+                bookmark.setOnClickListener(view -> {
+                    if(isBookMarked == true) {
+
+                        new Thread(() -> databaseLibrary.deleteBookmarkList(classroom)).start();
+                        Toast.makeText(getApplicationContext(), "즐겨찾기가 해제됐습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        new Thread(() -> databaseLibrary.insertBookmarkList(classroom)).start();
+                        Toast.makeText(getApplicationContext(), "즐겨찾기에 추가됐습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                    finish();
+                });
+            }
+
+
+        }.execute();
+
     }
 
 

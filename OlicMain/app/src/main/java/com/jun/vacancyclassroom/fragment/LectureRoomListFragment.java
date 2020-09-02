@@ -1,7 +1,10 @@
 package com.jun.vacancyclassroom.fragment;
 
 
+import android.app.ProgressDialog;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -20,11 +23,14 @@ import androidx.fragment.app.Fragment;
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.jun.vacancyclassroom.activity.LoadingActivity;
 import com.jun.vacancyclassroom.adapter.SearchAdapter;
 import com.jun.vacancyclassroom.database.DatabaseLibrary;
 import com.jun.vacancyclassroom.item.SearchItem;
 
 import java.util.ArrayList;
+
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 
 
 public class LectureRoomListFragment extends Fragment {
@@ -72,6 +78,10 @@ public class LectureRoomListFragment extends Fragment {
     }
 
     private void setListView() {
+
+        ProgressDialog asyncDialog = new ProgressDialog(
+                getContext(), R.style.AppCompatAlertDialogStyle);
+
         listView=(ListView)view.findViewById(R.id.searchlist_a);
         listView.setAdapter(adapter);
 
@@ -80,6 +90,11 @@ public class LectureRoomListFragment extends Fragment {
             SearchItem item=(SearchItem)adapter.getItem(i);
 
             new AsyncTask<Void, Void, Boolean>(){
+
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                }
 
                 @Override
                 protected Boolean doInBackground(Void... voids) {
@@ -161,8 +176,21 @@ public class LectureRoomListFragment extends Fragment {
     //리스트뷰 생성
     public void loadList(String searching_word)
     {
+        ProgressDialog asyncDialog = new ProgressDialog(
+                getContext(), R.style.AppCompatAlertDialogStyle);
+
         new AsyncTask<Void, Void, Cursor>()
         {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                asyncDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                asyncDialog.setCancelable(false);
+                asyncDialog.setCanceledOnTouchOutside(false);//터치해도 다이얼로그 안 사라짐
+
+                asyncDialog.show();
+            }
+
             @Override
             protected Cursor doInBackground(Void... voids) {
                 return databaseLibrary.selectLectureRoomList();
@@ -192,6 +220,9 @@ public class LectureRoomListFragment extends Fragment {
                     }
                 }
                 cursor.close();
+
+                asyncDialog.dismiss();
+                asyncDialog.cancel(); //메모리 누수방지지
             }
 
         }.execute();
@@ -202,24 +233,39 @@ public class LectureRoomListFragment extends Fragment {
     //체크 되어 있는지 여부
     private void getChecked(){
 
+        ProgressDialog asyncDialog = new ProgressDialog(
+                getContext(), R.style.AppCompatAlertDialogStyle);
+
         old_checked = new ArrayList<>();
 
         new AsyncTask<Void, Object, Void>()
         {
             @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+                asyncDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                asyncDialog.setCancelable(false);
+                asyncDialog.setCanceledOnTouchOutside(false);//터치해도 다이얼로그 안 사라짐
+
+                asyncDialog.show();
+            }
+
+            @Override
             protected Void doInBackground(Void... voids) {
 
-             /*   Cursor cursor = databaseLibrary.selectBookmarkList();
+
+                Cursor cursor = databaseLibrary.selectBookmarkList();
 
                 while(cursor.moveToNext())
                     old_checked.add(cursor.getString(0));
 
                 cursor.close();
-*/
+
                 for(int i = 0;i<adapter.getCount();i++){
                     SearchItem item=(SearchItem)adapter.getItem(i);
 
-                    Cursor cursor = databaseLibrary.selectBookmarkList(item.getClassroom());
+                    cursor = databaseLibrary.selectBookmarkList(item.getClassroom());
 
                     //만약 즐겨찾기 db에 없다면 체크해제
                     if(cursor.getCount()==0)
@@ -241,6 +287,14 @@ public class LectureRoomListFragment extends Fragment {
                 boolean check = (boolean)values[1];
 
                 listView.setItemChecked(index, check);
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                asyncDialog.dismiss();
+                asyncDialog.cancel(); //메모리 누수방지지
             }
         }.execute();
 

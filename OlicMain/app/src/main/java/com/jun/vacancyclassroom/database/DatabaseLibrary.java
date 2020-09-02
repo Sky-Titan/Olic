@@ -63,7 +63,7 @@ public class DatabaseLibrary {
     {
         db.execSQL("CREATE TABLE IF NOT EXISTS lecture"
                 +"(lectureCode TEXT PRIMARY KEY, lectureName TEXT, lectureCredit TEXT, professor TEXT, quota TEXT, peopleNumber TEXT, lectureRoom TEXT, lectureTime TEXT);");
-        db.execSQL("CREATE TABLE IF NOT EXISTS lectureRoomList (lectureRoom TEXT PRIMARY KEY, time TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS lectureRoomList (lectureRoom TEXT PRIMARY KEY, time TEXT, FOREIGN KEY(lectureRoom) REFERENCES lecture(lectureRoom))");
         db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (lectureRoom TEXT, FOREIGN KEY(lectureRoom) REFERENCES lecture(lectureRoom))");
     }
 
