@@ -278,7 +278,7 @@ public class TimeTableActivity extends AppCompatActivity {
         spanCell.setLayoutParams(layoutParams);//다시 적용
 
         spanCell.setText("     ");//빈 텍스트 적용
-        /*TODO :기기마다 버그 발생할 확률 높음!!!!!! */
+        /* TODO :기기마다 버그 발생할 확률 높음!!!!!! */
 
         spanCell.setBackground(getResources().getDrawable(R.drawable.fill_cell));
     }

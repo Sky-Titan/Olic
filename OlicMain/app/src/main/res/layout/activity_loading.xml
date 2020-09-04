@@ -7,7 +7,7 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:clickable="false"
 android:focusable="false"
-tools:context=".LoadingActivity"
+tools:context="com.jun.vacancyclassroom.activity.LoadingActivity"
 android:theme="@style/AppCompatAlertDialogStyle">
 
 </androidx.constraintlayout.widget.ConstraintLayout>
