@@ -1,8 +1,6 @@
 package com.jun.vacancyclassroom.fragment;
 
 
-import android.app.ProgressDialog;
-import android.app.VoiceInteractor;
 import android.os.Bundle;
 
 
@@ -13,24 +11,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vacancyclassroom.R;
 import com.example.vacancyclassroom.databinding.FragmentLectureroomlistBinding;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.adapter.LectureRoomListAdapter;
-import com.jun.vacancyclassroom.database.DatabaseLibrary;
-import com.jun.vacancyclassroom.item.Lecture;
-import com.jun.vacancyclassroom.item.LectureRoom;
-import com.jun.vacancyclassroom.item.ListLiveData;
+import com.jun.vacancyclassroom.model.LectureRoom;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.ArrayList;

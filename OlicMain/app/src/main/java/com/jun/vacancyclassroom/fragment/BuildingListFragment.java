@@ -1,7 +1,6 @@
 package com.jun.vacancyclassroom.fragment;
 
 
-import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,24 +10,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.adapter.BuildingListAdapter;
-import com.jun.vacancyclassroom.item.Building;
-import com.jun.vacancyclassroom.item.LectureRoom;
+import com.jun.vacancyclassroom.model.Building;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 
 public class BuildingListFragment extends Fragment {

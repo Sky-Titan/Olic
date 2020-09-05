@@ -1,10 +1,5 @@
 package com.jun.vacancyclassroom.activity;
 
-import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Color;
-
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -12,15 +7,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vacancyclassroom.R;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.database.DatabaseLibrary;
 import com.jun.vacancyclassroom.adapter.BookmarkListAdapter;
-import com.jun.vacancyclassroom.item.BookMarkedRoom;
-
-import java.util.Calendar;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
 
 public class BuildingActivity extends AppCompatActivity {
 

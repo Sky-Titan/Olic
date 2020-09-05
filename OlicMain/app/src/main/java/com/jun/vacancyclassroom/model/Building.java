@@ -1,4 +1,4 @@
-package com.jun.vacancyclassroom.item;
+package com.jun.vacancyclassroom.model;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.room.Room;
 
 @Entity
 public class Building {

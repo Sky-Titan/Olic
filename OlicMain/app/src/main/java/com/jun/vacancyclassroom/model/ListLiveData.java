@@ -1,6 +1,5 @@
-package com.jun.vacancyclassroom.item;
+package com.jun.vacancyclassroom.model;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;

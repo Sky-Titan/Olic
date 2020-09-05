@@ -4,26 +4,20 @@ package com.jun.vacancyclassroom.adapter;
 import android.app.Application;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.ListAdapter;
-import androidx.room.RoomDatabase;
 
 import com.example.vacancyclassroom.R;
 import com.example.vacancyclassroom.databinding.LectureroomlistItemBinding;
 import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;
 import com.jun.vacancyclassroom.database.MyViewHolder;
-import com.jun.vacancyclassroom.item.BookMarkedRoom;
-import com.jun.vacancyclassroom.item.LectureRoom;
+import com.jun.vacancyclassroom.model.BookMarkedRoom;
+import com.jun.vacancyclassroom.model.LectureRoom;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
-import java.io.PipedOutputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;

@@ -3,10 +3,10 @@
     <data>
         <variable
             name="lectureRoom"
-            type="com.jun.vacancyclassroom.item.LectureRoom" />
+            type="com.jun.vacancyclassroom.model.LectureRoom" />
     </data>
 
-    <com.jun.vacancyclassroom.item.CheckableLinearLayout
+    <com.jun.vacancyclassroom.model.CheckableLinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:orientation="horizontal"
@@ -33,5 +33,5 @@
             android:gravity="center"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
-    </com.jun.vacancyclassroom.item.CheckableLinearLayout>
+    </com.jun.vacancyclassroom.model.CheckableLinearLayout>
 </layout>

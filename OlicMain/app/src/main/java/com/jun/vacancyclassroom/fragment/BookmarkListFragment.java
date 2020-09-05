@@ -1,13 +1,8 @@
 package com.jun.vacancyclassroom.fragment;
 
 
-import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -18,22 +13,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TimePicker;
 
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.jun.vacancyclassroom.activity.TimeTableActivity;
 import com.jun.vacancyclassroom.adapter.BookmarkListAdapter;
-import com.jun.vacancyclassroom.database.DatabaseLibrary;
-import com.jun.vacancyclassroom.item.BookMarkedRoom;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 

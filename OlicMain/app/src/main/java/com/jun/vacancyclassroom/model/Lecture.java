@@ -1,15 +1,11 @@
-package com.jun.vacancyclassroom.item;
+package com.jun.vacancyclassroom.model;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.room.Room;
-
-import org.jsoup.select.Elements;
 
 @Entity
 public class Lecture {
@@ -25,6 +21,11 @@ public class Lecture {
     public String lecture_room="";
     public String lecture_time="";
 
+
+    public Lecture()
+    {
+
+    }
 
     public Lecture(String lecture_code, String lecture_name, String lecture_credit, String professor, String quota, String req_cnt, String lecture_room, String lecture_time) {
         this.lecture_code = lecture_code;

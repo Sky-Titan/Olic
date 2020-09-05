@@ -1,46 +1,42 @@
-package com.jun.vacancyclassroom.item;
+package com.jun.vacancyclassroom.model;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.room.Room;
 
 @Entity
-public class BookMarkedRoom {
+public class LectureRoom {
 
     @PrimaryKey
     @NonNull
-    @ForeignKey(entity = LectureRoom.class, parentColumns = "lecture_room", childColumns = "lecture_room")
     public String lecture_room = "";
 
-    public BookMarkedRoom(String lecture_room) {
+    public LectureRoom(String lecture_room) {
         this.lecture_room = lecture_room;
     }
 
-
     @Override
     public boolean equals(@Nullable Object obj) {
-        BookMarkedRoom other = (BookMarkedRoom) obj;
-
+        LectureRoom other = (LectureRoom)obj;
         if(this.lecture_room.equals(other.lecture_room))
             return true;
         return false;
     }
 
+
+
     @Ignore
-    public static DiffUtil.ItemCallback<BookMarkedRoom> DIFF_CALLBACK = new  DiffUtil.ItemCallback<BookMarkedRoom>() {
+    public static DiffUtil.ItemCallback<LectureRoom> DIFF_CALLBACK = new  DiffUtil.ItemCallback<LectureRoom>() {
         @Override
-        public boolean areItemsTheSame(@NonNull BookMarkedRoom oldItem, @NonNull BookMarkedRoom newItem) {
+        public boolean areItemsTheSame(@NonNull LectureRoom oldItem, @NonNull LectureRoom newItem) {
             return oldItem.lecture_room.equals(newItem.lecture_room);
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull BookMarkedRoom oldItem, @NonNull BookMarkedRoom newItem) {
+        public boolean areContentsTheSame(@NonNull LectureRoom oldItem, @NonNull LectureRoom newItem) {
             return oldItem.lecture_room.equals(newItem.lecture_room);
         }
 

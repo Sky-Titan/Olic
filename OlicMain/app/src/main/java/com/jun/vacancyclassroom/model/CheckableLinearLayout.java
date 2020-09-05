@@ -1,4 +1,4 @@
-package com.jun.vacancyclassroom.item;
+package com.jun.vacancyclassroom.model;
 
 import android.content.Context;
 import android.util.AttributeSet;

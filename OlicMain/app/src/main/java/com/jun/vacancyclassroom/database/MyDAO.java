@@ -7,10 +7,11 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.jun.vacancyclassroom.item.BookMarkedRoom;
-import com.jun.vacancyclassroom.item.Building;
-import com.jun.vacancyclassroom.item.Lecture;
-import com.jun.vacancyclassroom.item.LectureRoom;
+import com.jun.vacancyclassroom.model.BookMarkedRoom;
+import com.jun.vacancyclassroom.model.Building;
+import com.jun.vacancyclassroom.model.Lecture;
+import com.jun.vacancyclassroom.model.LectureRoom;
+import com.jun.vacancyclassroom.model.SearchLecture;
 
 import java.util.List;
 
@@ -24,13 +25,16 @@ public interface MyDAO {
     public LiveData<List<LectureRoom>> selectAllLectureRooms();
 
     @Query("SELECT * FROM BookMarkedRoom")
-    public LiveData<List<BookMarkedRoom>> selectAllBookMarkedRoom();
+    public LiveData<List<BookMarkedRoom>> selectAllBookMarkedRooms();
 
-    @Query("SELECT DISTINCT lecture_time FROM Lecture WHERE lecture_room = :lecture_room")
-    public List<String> selectAllLectureTimesIn(String lecture_room);
+    @Query("SELECT * FROM SearchLecture")
+    public LiveData<List<SearchLecture>> selectAllSearchLectures();
 
     @Query("SELECT * FROM Building")
     public LiveData<List<Building>> selectAllBuildings();
+
+    @Query("SELECT DISTINCT lecture_time FROM Lecture WHERE lecture_room = :lecture_room")
+    public List<String> selectAllLectureTimesIn(String lecture_room);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertLecture(Lecture lecture);
@@ -44,6 +48,9 @@ public interface MyDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public void insertBookMarkedRoom(BookMarkedRoom bookMarkedRoom);
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public void insertSearchLecture(SearchLecture searchlecture);
+
     @Query("DELETE FROM BookMarkedRoom")
     public void deleteAllBookmarkedRooms();
 
@@ -56,9 +63,15 @@ public interface MyDAO {
     @Query("DELETE FROM LectureRoom")
     public void deleteAllLectureRooms();
 
+    @Query("DELETE FROM SearchLecture")
+    public void deleteAllSearchLecture();
+
     @Delete
     public void deleteLecture(Lecture lecture);
 
     @Delete
     public void deleteBookMarkedRoom(BookMarkedRoom bookMarkedRoom);
+
+    @Delete
+    public void deleteSearchLecture(SearchLecture searchLecture);
 }

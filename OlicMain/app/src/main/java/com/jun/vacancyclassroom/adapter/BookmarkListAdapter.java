@@ -2,35 +2,26 @@ package com.jun.vacancyclassroom.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.ParcelUuid;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ListAdapter;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vacancyclassroom.R;
 import com.example.vacancyclassroom.databinding.BookmarklistItemBinding;
 import com.jun.vacancyclassroom.activity.TimeTableActivity;
 import com.jun.vacancyclassroom.database.MyViewHolder;
 
-import com.jun.vacancyclassroom.item.BookMarkedRoom;
+import com.jun.vacancyclassroom.model.BookMarkedRoom;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 

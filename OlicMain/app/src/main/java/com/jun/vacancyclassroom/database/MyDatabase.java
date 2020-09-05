@@ -1,6 +1,7 @@
 package com.jun.vacancyclassroom.database;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 
 import androidx.annotation.WorkerThread;
@@ -9,10 +10,11 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 import com.jun.vacancyclassroom.interfaces.UpdateCallback;
-import com.jun.vacancyclassroom.item.BookMarkedRoom;
-import com.jun.vacancyclassroom.item.Building;
-import com.jun.vacancyclassroom.item.Lecture;
-import com.jun.vacancyclassroom.item.LectureRoom;
+import com.jun.vacancyclassroom.model.BookMarkedRoom;
+import com.jun.vacancyclassroom.model.Building;
+import com.jun.vacancyclassroom.model.Lecture;
+import com.jun.vacancyclassroom.model.LectureRoom;
+import com.jun.vacancyclassroom.model.SearchLecture;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,9 +22,10 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
-@Database(version = 1, entities = {Lecture.class, LectureRoom.class, BookMarkedRoom.class, Building.class})
+@Database(version = 1, entities = {Lecture.class, LectureRoom.class, BookMarkedRoom.class, Building.class, SearchLecture.class})
 public abstract class MyDatabase extends RoomDatabase {
 
     public abstract MyDAO dao();
@@ -41,6 +44,50 @@ public abstract class MyDatabase extends RoomDatabase {
         return instance;
     }
 
+    //lecture 검색
+    public Lecture searchLecture(String lecture_code)
+    {
+        Lecture lecture = null;
+        try
+        {
+            String url = "http://my.knu.ac.kr/stpo/stpo/cour/lectReqCntEnq/list.action?lectReqCntEnq.search_subj_cde=" + lecture_code.substring(0, 7) + "&lectReqCntEnq.search_sub_class_cde=" + lecture_code.substring(7) + "&searchValue=" + lecture_code + "";
+
+            final Document doc = Jsoup.connect(url).get();
+
+            //System.out.println("main url : " + url);
+
+            final Elements lectureCode = doc.select("td.subj_class_cde");//과목코드
+            final Elements lectureName = doc.select("td.subj_nm");//과목이름
+            final Elements lectureCredit = doc.select("td.unit");//학점
+            final Elements lectureProfessor = doc.select("td.prof_nm");//강의교수
+            final Elements lectureTime = doc.select("td.lect_wk_tm");//강의시간
+            final Elements lectureQuota = doc.select("td.lect_quota");//수강정원
+            final Elements lectureReq = doc.select("td.lect_req_cnt");//수강신청인원
+
+            //this.lecture_code = lecture_code;
+            //        this.lecture_name = lecture_name;
+            //        this.lecture_credit = lecture_credit;
+            //        this.professor = professor;
+            //        this.quota = quota;
+            //        this.req_cnt = req_cnt;
+            //        this.lecture_room = lecture_room;
+            //        this.lecture_time = lecture_time;
+            if(lectureCode.hasText())
+            {
+                lecture = new Lecture(lectureCode.get(0).text().trim(), lectureName.get(0).text().trim(), lectureCredit.get(0).text().trim(), lectureProfessor.get(0).text().trim()
+                , lectureQuota.get(0).text().trim(), lectureReq.get(0).text().trim(),"", lectureTime.get(0).text().trim());
+            }
+            else//존재하지 않으면 삭제
+                dao().deleteSearchLecture(new SearchLecture(lecture_code));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return lecture;
+    }
+
     public int getUrlListSize()
     {
         return url_List.size();
@@ -54,6 +101,7 @@ public abstract class MyDatabase extends RoomDatabase {
         dao().deleteAllLectures();
         dao().deleteAllBookmarkedRooms();
         dao().deleteAllLectureRooms();
+        dao().deleteAllSearchLecture();
 
         this.semester = year+semester;
 
