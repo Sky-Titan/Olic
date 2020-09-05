@@ -8,19 +8,19 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.vacancyclassroom.R;
-import com.jun.vacancyclassroom.item.BuildingItem;
+import com.jun.vacancyclassroom.item.Building;
 
 import java.util.ArrayList;
 
-public class BuildingSearchAdapter extends BaseAdapter {
+public class BuildingSearchAdapter {
 
-    private ArrayList<BuildingItem> buildingItemList = new ArrayList<BuildingItem>() ;
+ /*   private ArrayList<Building> buildingList = new ArrayList<Building>() ;
     public BuildingSearchAdapter(){
     }
     // Adapter에 사용되는 데이터의 개수를 리턴. : 필수 구현
     @Override
     public int getCount() {
-        return buildingItemList.size() ;
+        return buildingList.size() ;
     }
 
     // position에 위치한 데이터를 화면에 출력하는데 사용될 View를 리턴. : 필수 구현
@@ -39,11 +39,11 @@ public class BuildingSearchAdapter extends BaseAdapter {
         TextView building_name = (TextView) convertView.findViewById(R.id.building_name);
 
         // Data Set(listViewItemList)에서 position에 위치한 데이터 참조 획득
-        BuildingItem buildingItem = buildingItemList.get(position);
+        Building building = buildingList.get(position);
 
         // 아이템 내 각 위젯에 데이터 반영
 
-        building_name.setText(buildingItem.getBuildingName());
+        building_name.setText(building.getBuildingName());
 
         return convertView;
     }
@@ -57,15 +57,16 @@ public class BuildingSearchAdapter extends BaseAdapter {
     // 지정한 위치(position)에 있는 데이터 리턴 : 필수 구현
     @Override
     public Object getItem(int position) {
-        return buildingItemList.get(position) ;
+        return buildingList.get(position) ;
     }
 
     // 아이템 데이터 추가를 위한 함수. 개발자가 원하는대로 작성 가능.
     public void addItem(String buildingName) {
-        BuildingItem item = new BuildingItem();
+        Building item = new Building();
 
         item.setBuildingName(buildingName);
-        buildingItemList.add(item);
+        buildingList.add(item);
     }
+    */
 }
 

@@ -17,6 +17,7 @@ import com.example.vacancyclassroom.R;
 import com.example.vacancyclassroom.databinding.LectureroomlistItemBinding;
 import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;
+import com.jun.vacancyclassroom.database.MyViewHolder;
 import com.jun.vacancyclassroom.item.BookMarkedRoom;
 import com.jun.vacancyclassroom.item.LectureRoom;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;

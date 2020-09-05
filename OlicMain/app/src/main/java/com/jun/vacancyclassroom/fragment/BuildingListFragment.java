@@ -1,34 +1,21 @@
 package com.jun.vacancyclassroom.fragment;
 
 
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.example.vacancyclassroom.R;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.jun.vacancyclassroom.activity.BuildingActivity;
 import com.jun.vacancyclassroom.adapter.BuildingSearchAdapter;
-import com.jun.vacancyclassroom.database.DatabaseLibrary;
-import com.jun.vacancyclassroom.database.MyDBHelper;
-import com.jun.vacancyclassroom.item.BuildingItem;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
-
 
 
 public class BuildingListFragment extends Fragment {

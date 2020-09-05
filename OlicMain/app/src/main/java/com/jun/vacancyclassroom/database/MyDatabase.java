@@ -1,14 +1,18 @@
 package com.jun.vacancyclassroom.database;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import androidx.annotation.WorkerThread;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import com.jun.vacancyclassroom.interfaces.UpdateCallback;
+import com.jun.vacancyclassroom.item.BookMarkedRoom;
+import com.jun.vacancyclassroom.item.Building;
+import com.jun.vacancyclassroom.item.Lecture;
+import com.jun.vacancyclassroom.item.LectureRoom;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,97 +20,25 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
-public class DatabaseLibrary {
+@Database(version = 1, entities = {Lecture.class, LectureRoom.class, BookMarkedRoom.class, Building.class})
+public abstract class MyDatabase extends RoomDatabase {
 
-    MyDBHelper helper;
-    Context context;
-    private ArrayList<String> url_List=new ArrayList<>();
-
+    public abstract MyDAO dao();
     private String semester="";
+    private ArrayList<String> url_List=new ArrayList<>();
+    private static MyDatabase instance;
 
+    private static final String TAG = "MyDatabase";
 
-    int lectures_size=0;
-
-    private static final String TAG_RESULTS = "result";
-    private static final String TAG_CLASSROOM = "classroom";
-    private static final String TAG_CODE = "code";
-    private static final String TAG_TITLE = "title";
-    private static final String TAG_TIME = "time";
-
-    private static final String TAG = "UpdateDB";
-    ProgressDialog progressDialog;
-
-    private static DatabaseLibrary databaseLibrary;
-
-    private SQLiteDatabase db;
-
-
-    private DatabaseLibrary(Context context){
-        helper=new MyDBHelper(context,"lecture_list.db",null,1);
-        db = helper.getWritableDatabase();
-
-        createTables();
-    }
-
-
-    public void deleteAllRecords() {
-        dropTables();
-        createTables();
-    }
-
-    public void dropTables()
+    public synchronized static MyDatabase getInstance(Context context)
     {
-        db.execSQL("DROP TABLE IF EXISTS lectureRoomList");
-        db.execSQL("DROP TABLE IF EXISTS bookmarklist");
-        db.execSQL("DROP TABLE IF EXISTS lecture");
-    }
-
-    public void createTables()
-    {
-        db.execSQL("CREATE TABLE IF NOT EXISTS lecture"
-                +"(lectureCode TEXT PRIMARY KEY, lectureName TEXT, lectureCredit TEXT, professor TEXT, quota TEXT, peopleNumber TEXT, lectureRoom TEXT, lectureTime TEXT);");
-        db.execSQL("CREATE TABLE IF NOT EXISTS lectureRoomList (lectureRoom TEXT PRIMARY KEY, time TEXT, FOREIGN KEY(lectureRoom) REFERENCES lecture(lectureRoom))");
-        db.execSQL("CREATE TABLE IF NOT EXISTS bookmarklist (lectureRoom TEXT, FOREIGN KEY(lectureRoom) REFERENCES lecture(lectureRoom))");
-    }
-
-    public static DatabaseLibrary getInstance(Context context)
-    {
-        if(databaseLibrary == null)
-            databaseLibrary = new DatabaseLibrary(context);
-        return databaseLibrary;
-    }
-
-
-
-    public Cursor selectLectureRoomList(String lectureRoom)
-    {
-        return db.rawQuery("SELECT * FROM lectureRoomList WHERE lectureRoom = '"+lectureRoom+"';", null);
-    }
-
-    public Cursor selectLectureRoomList()
-    {
-        return db.rawQuery("SELECT * FROM lectureRoomList;", null);
-    }
-
-    public Cursor selectBookmarkList()
-    {
-        return db.rawQuery("SELECT * FROM bookmarklist;",null);
-    }
-
-    public Cursor selectBookmarkList(String lectureRoom)
-    {
-        return db.rawQuery("SELECT * FROM bookmarklist WHERE lectureRoom ='"+lectureRoom+"';",null);
-    }
-
-    public void insertBookmarkList(String lectureRoom)
-    {
-        db.execSQL("INSERT INTO bookmarklist VALUES ('"+lectureRoom+"');");
-    }
-
-    public void deleteBookmarkList(String lectureRoom)
-    {
-        db.execSQL("DELETE FROM bookmarklist WHERE lectureRoom = '"+lectureRoom+"';");
+        if(instance == null)
+        {
+            instance = Room.databaseBuilder(context, MyDatabase.class, "olic.db").build();
+        }
+        return instance;
     }
 
     public int getUrlListSize()
@@ -118,10 +50,14 @@ public class DatabaseLibrary {
     @WorkerThread
     public boolean doUpdate(int year, String semester, UpdateCallback callback)
     {
-        deleteAllRecords();
+        dao().deleteAllBuildings();
+        dao().deleteAllLectures();
+        dao().deleteAllBookmarkedRooms();
+        dao().deleteAllLectureRooms();
 
         this.semester = year+semester;
 
+        url_List.clear();
         //정규학기
         if(semester.equals("2") || semester.equals("1"))
             add_url();
@@ -148,16 +84,20 @@ public class DatabaseLibrary {
 
                 for (int j = 0; j < lectureCode.size(); j++)
                 {
-                    lectures_size++;
+                    dao().insertLecture(new Lecture(lectureCode.get(j).text().trim(), lectureName.get(j).text().trim()
+                            ,lectureCredit.get(j).text().trim(), professor.get(j).text().trim(), quota.get(j).text().trim(),
+                            peopleNumber.get(j).text().trim(),lectureRoom.get(j).text().trim() , lectureTime.get(j).text().trim()));
+
+                    dao().insertLectureRoom(new LectureRoom(lectureRoom.get(j).text().trim()));
+
+                    StringTokenizer strtok = new StringTokenizer(lectureRoom.get(j).text().trim(), "-");
+
+                    if(strtok.hasMoreTokens())
+                    dao().insertBuilding(new Building(strtok.nextToken()));
                     //(lectureCode TEXT PRIMARY KEY, lectureName TEXT, lectureCredit TEXT, professor TEXT, quota TEXT, peopleNumber TEXT, lectureRoom TEXT, lectureTime TEXT)
-                    db.execSQL("REPLACE INTO lecture VALUES('" + lectureCode.get(j).text().trim() + "','" + lectureName.get(j).text().trim()
-                            + "','"+lectureCredit.get(j).text().trim()+"','" + professor.get(j).text().trim()+"','" + quota.get(j).text().trim()+"','"
-                            + peopleNumber.get(j).text().trim() +"','" +lectureRoom.get(j).text().trim() + "','" + lectureTime.get(j).text().trim() + "')");
                 }
             }
 
-            //강의실 데이터베이스 생성
-            MakinglectureRoomList();
             return true;
 
         }
@@ -166,51 +106,6 @@ public class DatabaseLibrary {
             e.printStackTrace();
             return false;
         }
-    }
-
-
-    public void closeDB()
-    {
-        if(db!=null){
-            db.close();
-        }
-    }
-
-    //강의별 정보 -> 강의실별 데이터베이스로 재구성
-    public void MakinglectureRoomList()
-    {
-        Cursor c= db.rawQuery("SELECT lectureRoom, lectureTime FROM lecture",null);
-
-        while(c.moveToNext())
-        {
-            String lectureRoom = c.getString(0);
-            String time = c.getString(1);
-            Log.d(TAG, lectureRoom +" "+time);
-
-            //해당 강의실 정보 불러옴
-            Cursor c2 = selectLectureRoomList(lectureRoom);
-
-            int j=0;
-            while(c2.moveToNext()){
-                j++;
-            }
-
-            c2.moveToFirst();
-
-            if(j==0)//classroom이 안들어가있으므로 바로 insert문 사용
-            {
-                db.execSQL("INSERT INTO lectureRoomList values('"+lectureRoom+"','"+time+"');");
-            }
-            else
-            {
-                //이미 들어가 있으므로 string에 추가만
-                String time2=c2.getString(1);
-                time2+=" "+time;
-
-                db.execSQL("UPDATE lectureRoomList SET time='"+time2+"' WHERE lectureRoom='"+lectureRoom+"';");
-            }
-        }
-
     }
 
     //계절학기 링크
