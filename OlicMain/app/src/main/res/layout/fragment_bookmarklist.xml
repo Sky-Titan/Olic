@@ -74,13 +74,14 @@
     </LinearLayout>
 
 
-    <ListView
-        android:id="@+id/searchlist_b"
-        android:choiceMode="multipleChoice"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bookmakrlist_recyclerview"
+        app:layout_constrainedHeight="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/linearLayout_time"
         app:layout_constraintBottom_toBottomOf="parent"
-        ></ListView>
+        ></androidx.recyclerview.widget.RecyclerView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

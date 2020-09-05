@@ -41,6 +41,10 @@ public class MainViewModel extends ViewModel {
         return dao.selectAllLectures();
     }
 
+    public List<String> getTimeListOf(String lecture_room)
+    {
+        return dao.selectAllLectureTimesIn(lecture_room);
+    }
 
     public LiveData<List<LectureRoom>> getLectureRooms()
     {
@@ -59,7 +63,7 @@ public class MainViewModel extends ViewModel {
         executorService.execute(() -> dao.deleteLecture(lecture));
     }
 
-    public LiveData<List<String>> getBookMarkedRoomsData()
+    public LiveData<List<BookMarkedRoom>> getBookMarkedRoomsData()
     {
         return dao.selectAllBookMarkedRoom();
     }

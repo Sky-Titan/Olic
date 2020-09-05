@@ -40,18 +40,15 @@ import java.util.List;
 public class LectureRoomListFragment extends Fragment {
 
     private static LectureRoomListAdapter adapter;
-    private RecyclerView recyclerView;
     private AdView mAdView;
 
     private View view;
-    private ArrayList<String> old_checked=new ArrayList<>();
     private EditText search_edittext;
 
-    private DatabaseLibrary databaseLibrary;
-
     private static MainViewModel viewModel;
-
     private FragmentLectureroomlistBinding binding;
+
+
 
     public LectureRoomListFragment() {
         // Required empty public constructor
@@ -68,8 +65,6 @@ public class LectureRoomListFragment extends Fragment {
         binding.setLifecycleOwner(this);
         view = binding.getRoot();
 
-//        databaseLibrary = DatabaseLibrary.getInstance(null);
-
         setAdView();
 
         adapter = new LectureRoomListAdapter(getActivity().getApplication(), viewModel);
@@ -80,11 +75,19 @@ public class LectureRoomListFragment extends Fragment {
             adapter.submitList(list);
         });
 
-        //q
         viewModel.getBookMarkedRoomsData().observe(getViewLifecycleOwner(), bookMarkedRooms -> {
-            adapter.setBookmarkedSet(bookMarkedRooms);
+
+            ArrayList<String> list = new ArrayList<>();
+
+            for(int i = 0;i < bookMarkedRooms.size();i++)
+                list.add(bookMarkedRooms.get(i).lecture_room);
+
+            adapter.setBookmarkedSet(list);
         });
 
+        //구분선 적용
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+        binding.lecturelistRecyclerview.addItemDecoration(dividerItemDecoration);
         binding.lecturelistRecyclerview.setAdapter(adapter);
 
         setSearchEdit();
@@ -93,7 +96,7 @@ public class LectureRoomListFragment extends Fragment {
     }
 
 
-    //검색
+    //검색창 설정
     private void setSearchEdit() {
 
         search_edittext=(EditText)view.findViewById(R.id.search_classroom);
@@ -112,6 +115,7 @@ public class LectureRoomListFragment extends Fragment {
 
                 List<LectureRoom> list = new ArrayList<>();
 
+                //검색어 없으면 전체 포함
                 if(searchWord.isEmpty())
                 {
                     viewModel.getLectureRooms().observe(getViewLifecycleOwner(), lectureRooms -> {
@@ -130,7 +134,7 @@ public class LectureRoomListFragment extends Fragment {
                     });
                 }
 
-                //검색
+                //리스트 업데이트
                 adapter.submitList(list);
             }
 
@@ -149,131 +153,5 @@ public class LectureRoomListFragment extends Fragment {
         mAdView.loadAd(adRequest);
     }
 
-    //리스트뷰 생성
-/*    public void loadList(String searching_word)
-    {
-        ProgressDialog asyncDialog = new ProgressDialog(
-                getContext(), R.style.AppCompatAlertDialogStyle);
-
-        new AsyncTask<Void, Void, Cursor>()
-        {
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                asyncDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                asyncDialog.setCancelable(false);
-                asyncDialog.setCanceledOnTouchOutside(false);//터치해도 다이얼로그 안 사라짐
-
-                asyncDialog.show();
-            }
-
-            @Override
-            protected Cursor doInBackground(Void... voids) {
-                return databaseLibrary.selectLectureRoomList();
-            }
-
-            @Override
-            protected void onPostExecute(Cursor cursor) {
-                super.onPostExecute(cursor);
-                if(searching_word.equals(""))//전체보여주기
-                {
-                    while (cursor.moveToNext()) {
-
-                        String classroom = cursor.getString(0);
-                        String time = cursor.getString(1);
-                        adapter.addItem(classroom, time);
-                    }
-                }
-                else//검색어 존재할시
-                {
-                    while (cursor.moveToNext()) {
-                        String classroom = cursor.getString(0);
-                        String time = cursor.getString(1);
-
-                        //영어 대소문자 둘다 검사
-                        if(classroom.toUpperCase().contains(searching_word.trim()) || classroom.toLowerCase().contains(searching_word.trim()))
-                            adapter.addItem(classroom, time);
-                    }
-                }
-                cursor.close();
-
-                asyncDialog.dismiss();
-                asyncDialog.cancel(); //메모리 누수방지지
-            }
-
-        }.execute();
-
-    }
-*/
-
-    //체크 되어 있는지 여부
- /*   private void getChecked(){
-
-        ProgressDialog asyncDialog = new ProgressDialog(
-                getContext(), R.style.AppCompatAlertDialogStyle);
-
-        old_checked = new ArrayList<>();
-
-        new AsyncTask<Void, Object, Void>()
-        {
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-
-                asyncDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                asyncDialog.setCancelable(false);
-                asyncDialog.setCanceledOnTouchOutside(false);//터치해도 다이얼로그 안 사라짐
-
-                asyncDialog.show();
-            }
-
-            @Override
-            protected Void doInBackground(Void... voids) {
-
-
-                Cursor cursor = databaseLibrary.selectBookmarkList();
-
-                while(cursor.moveToNext())
-                    old_checked.add(cursor.getString(0));
-
-                cursor.close();
-
-                for(int i = 0;i<adapter.getCount();i++){
-                    LectureRoomItem item=(LectureRoomItem)adapter.getItem(i);
-
-                    cursor = databaseLibrary.selectBookmarkList(item.getLectureRoom());
-
-                    //만약 즐겨찾기 db에 없다면 체크해제
-                    if(cursor.getCount()==0)
-                        publishProgress(i, false);
-                        //즐겨찾기에 있다면 체크
-                    else
-                        publishProgress(i, true);
-                    cursor.close();
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onProgressUpdate(Object... values) {
-                super.onProgressUpdate(values);
-
-                int index = (int)values[0];
-                boolean check = (boolean)values[1];
-
-                recyclerView.setItemChecked(index, check);
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-
-                asyncDialog.dismiss();
-                asyncDialog.cancel(); //메모리 누수방지지
-            }
-        }.execute();
-
-    }*/
 
 }
