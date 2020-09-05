@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this, new MainViewModelFactory(getApplication())).get(MainViewModel.class);
 
 
-
         Myapplication myapplication = (Myapplication)getApplication();
         setTitle(myapplication.getCurrentSemester());
 
@@ -136,7 +135,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else//수강신청현황
                 {
-                   //TODO : 수강신청현황 새로고침 fragment_lectureSearch.loadAdapter();//새로고침
+                    viewModel.getSearchLectures().observe(this, searchLectures -> {
+                        fragment_lectureSearch.renewal(searchLectures);
+                    });
                 }
 
                 return true;
