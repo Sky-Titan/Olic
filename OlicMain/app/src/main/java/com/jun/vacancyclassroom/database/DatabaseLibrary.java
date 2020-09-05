@@ -8,6 +8,8 @@ import android.util.Log;
 
 import androidx.annotation.WorkerThread;
 
+import com.jun.vacancyclassroom.interfaces.UpdateCallback;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -47,6 +49,7 @@ public class DatabaseLibrary {
         createTables();
     }
 
+
     public void deleteAllRecords() {
         dropTables();
         createTables();
@@ -73,6 +76,8 @@ public class DatabaseLibrary {
             databaseLibrary = new DatabaseLibrary(context);
         return databaseLibrary;
     }
+
+
 
     public Cursor selectLectureRoomList(String lectureRoom)
     {
@@ -104,9 +109,14 @@ public class DatabaseLibrary {
         db.execSQL("DELETE FROM bookmarklist WHERE lectureRoom = '"+lectureRoom+"';");
     }
 
+    public int getUrlListSize()
+    {
+        return url_List.size();
+    }
+
     //실행
     @WorkerThread
-    public boolean doUpdate(int year, String semester)
+    public boolean doUpdate(int year, String semester, UpdateCallback callback)
     {
         deleteAllRecords();
 
@@ -124,6 +134,7 @@ public class DatabaseLibrary {
                 Document doc = Jsoup.connect(url_List.get(i)).get();
 
                 Log.i(TAG,(i + 1) + "번째 페이지");
+                callback.OnUpdateCallback(i);
 
                 //테스트1
                 Elements lectureCode = doc.select("td.th4");//과목코드

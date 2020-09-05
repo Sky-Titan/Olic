@@ -2,13 +2,10 @@ package com.jun.vacancyclassroom.activity;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -18,9 +15,8 @@ import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.database.DatabaseLibrary;
-import com.jun.vacancyclassroom.database.MyDBHelper;
-import com.jun.vacancyclassroom.adapter.BookMarkAdapter;
-import com.jun.vacancyclassroom.item.BookMarkItem;
+import com.jun.vacancyclassroom.adapter.BookmarkListAdapter;
+import com.jun.vacancyclassroom.item.BookMarkedRoom;
 
 import java.util.Calendar;
 import java.util.StringTokenizer;
@@ -28,7 +24,7 @@ import java.util.TimeZone;
 
 public class BuildingActivity extends AppCompatActivity {
 
-    private BookMarkAdapter adapter;
+    private BookmarkListAdapter adapter;
     private ListView listView;
     private AdView mAdView;
 
@@ -44,7 +40,7 @@ public class BuildingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_building);
 
-        databaseLibrary = DatabaseLibrary.getInstance(null);
+ /*       databaseLibrary = DatabaseLibrary.getInstance(null);
 
         mAdView = (AdView) findViewById(R.id.adView5);
         AdRequest adRequest = new AdRequest.Builder()
@@ -52,7 +48,7 @@ public class BuildingActivity extends AppCompatActivity {
                 .build();
         mAdView.loadAd(adRequest);
 
-        adapter=new BookMarkAdapter();
+        adapter=new BookmarkListAdapter();
         listView=(ListView)findViewById(R.id.classroomlist_buildingActivity);
         listView.setAdapter(adapter);
 
@@ -64,17 +60,17 @@ public class BuildingActivity extends AppCompatActivity {
 
 
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
-                BookMarkItem item=(BookMarkItem)adapter.getItem(i);
+                BookMarkedRoom item=(BookMarkedRoom)adapter.getItem(i);
 
                 Intent intent2 = new Intent(BuildingActivity.this,TimeTableActivity.class);
-                intent2.putExtra("classroom",item.getClassroom());
+                intent2.putExtra("classroom",item.getLecture_room());
                 intent2.putExtra("isBuilding",true);
                 startActivity(intent2);
         });
 
-        loadList();
+        loadList();*/
     }
-    public void loadList(){
+   /* public void loadList(){
 
         new AsyncTask<Void, Void, Cursor>()
         {
@@ -99,8 +95,8 @@ public class BuildingActivity extends AppCompatActivity {
 
                 for(int i=0;i<adapter.getCount();i++)
                 {
-                    BookMarkItem item=(BookMarkItem)adapter.getItem(i);
-                    if(classification(item.getClassroom())==true)//이용가능시 초록색
+                    BookMarkedRoom item=(BookMarkedRoom)adapter.getItem(i);
+                    if(classification(item.getLecture_room())==true)//이용가능시 초록색
                     {
                         item.setButton_color(Color.GREEN);
                     }
@@ -267,5 +263,5 @@ public class BuildingActivity extends AppCompatActivity {
             return "일";
         else
             return "";
-    }
+    }*/
 }

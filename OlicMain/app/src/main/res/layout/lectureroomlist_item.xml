@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layout>
     <data>
         <variable
-            name="item"
-            type="com.jun.vacancyclassroom.item.BookMarkedRoom" />
+            name="lectureRoom"
+            type="com.jun.vacancyclassroom.item.LectureRoom" />
     </data>
 
-    <LinearLayout
+    <com.jun.vacancyclassroom.item.CheckableLinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:orientation="horizontal"
@@ -15,22 +14,24 @@
         android:layout_height="50dp">
 
         <TextView
-            android:id="@+id/lectureroom_bookmark"
-            android:text="@{item.lecture_room}"
+            android:id="@+id/lectureroom_name"
             android:layout_weight="4"
             android:layout_width="0dp"
             android:layout_marginLeft="20dp"
             android:gravity="center_vertical"
+            android:text="@{lectureRoom.lecture_room}"
             android:textStyle="bold"
             android:textSize="20dp"
             android:layout_height="match_parent" />
 
-        <Button
-            android:id="@+id/button_bookmark"
+        <CheckBox
+            android:id="@+id/checkBox1"
             android:layout_weight="1"
-            android:background="@color/red"
+            android:checked="false"
+            android:focusable="false"
+            android:clickable="false"
+            android:gravity="center"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
-
-    </LinearLayout>
+    </com.jun.vacancyclassroom.item.CheckableLinearLayout>
 </layout>

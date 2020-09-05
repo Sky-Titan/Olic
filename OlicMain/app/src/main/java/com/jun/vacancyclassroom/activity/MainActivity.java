@@ -13,9 +13,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager2.widget.ViewPager2;
 
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -27,15 +31,19 @@ import com.jun.vacancyclassroom.fragment.*;
 
 import com.jun.vacancyclassroom.Myapplication;
 import com.jun.vacancyclassroom.adapter.ViewPagerAdapter;
+import com.jun.vacancyclassroom.viewmodel.MainViewModel;
+import com.jun.vacancyclassroom.viewmodel.MainViewModelFactory;
 
 public class MainActivity extends AppCompatActivity {
 
     //메인화면구성
 
-    LectureRoomListFragment fragment_lectureRoomList;
-    BookmarkListFragment fragment_bookmarkList;
-    BuildingListFragment fragment_buildingList;
-    LectureSearchFragment fragment_lectureSearch;
+    private LectureRoomListFragment fragment_lectureRoomList;
+    private BookmarkListFragment fragment_bookmarkList;
+    private BuildingListFragment fragment_buildingList;
+    private LectureSearchFragment fragment_lectureSearch;
+
+    private MainViewModel viewModel;
 
     private ViewPager2 mViewPager;
 
@@ -47,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory(getApplication())).get(MainViewModel.class);
+
+
 
         Myapplication myapplication = (Myapplication)getApplication();
         setTitle(myapplication.getCurrentSemester());
@@ -124,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else//수강신청현황
                 {
-                    fragment_lectureSearch.loadAdapter();//새로고침
+                   //TODO : 수강신청현황 새로고침 fragment_lectureSearch.loadAdapter();//새로고침
                 }
 
                 return true;

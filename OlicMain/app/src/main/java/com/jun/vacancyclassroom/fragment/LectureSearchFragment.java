@@ -60,7 +60,7 @@ public class LectureSearchFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_lecturesearch,container,false);
 
 
-        setListView();
+/*        setListView();
 
         //adapter 새로고침
         loadAdapter();
@@ -68,11 +68,11 @@ public class LectureSearchFragment extends Fragment {
         add_lecture_edit = (EditText) view.findViewById(R.id.add_lecture_edit);
 
         setAddLectureBtn();
-
+*/
         return view;
     }
 
-    private void setAddLectureBtn() {
+  /*  private void setAddLectureBtn() {
         add_lecture = (Button) view.findViewById(R.id.add_lecture_btn);//강의 추가하기 버튼
         add_lecture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,7 +96,7 @@ public class LectureSearchFragment extends Fragment {
                 final Lecture lecture = (Lecture) adapter.getItem(i);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(lecture.getCode() + " " +lecture.getTitle());
+                builder.setTitle(lecture.getCode() + " " + lecture.getTitle());
                 builder.setMessage("해당 강의를 삭제하시겠습니까?");
                 builder.setPositiveButton("삭제",
                         new DialogInterface.OnClickListener() {
@@ -313,4 +313,6 @@ public class LectureSearchFragment extends Fragment {
 
         }
     }
+
+   */
 }

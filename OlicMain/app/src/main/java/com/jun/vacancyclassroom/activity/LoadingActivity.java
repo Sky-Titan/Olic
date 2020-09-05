@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,6 +18,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vacancyclassroom.R;
 import com.jun.vacancyclassroom.database.DatabaseLibrary;
+import com.jun.vacancyclassroom.database.MyDAO;
+import com.jun.vacancyclassroom.database.MyDatabase;
+import com.jun.vacancyclassroom.interfaces.UpdateCallback;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 
@@ -24,11 +35,23 @@ public class LoadingActivity extends AppCompatActivity {
 
     private String semester;
     private int year;
+    //private DatabaseLibrary databaseLibrary;
+
+    private MyDatabase database;
+
+    private MyDAO dao;
+
+    private static final String TAG = "LoadingActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
+
+        //databaseLibrary = DatabaseLibrary.getInstance(null);
+
+        database = MyDatabase.getInstance(getApplicationContext());
+        dao = database.dao();
 
         Intent intent = getIntent();
         year = intent.getIntExtra("year",0);
@@ -41,14 +64,16 @@ public class LoadingActivity extends AppCompatActivity {
         ProgressDialog asyncDialog = new ProgressDialog(
                 LoadingActivity.this, R.style.AppCompatAlertDialogStyle);
 
-        new AsyncTask(){
+        new AsyncTask<Void, Integer, Void>(){
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
 
+                int total_page = database.getUrlListSize();
+
                 asyncDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                asyncDialog.setMessage("시간표 동기화 중");
+                asyncDialog.setMessage("시간표 동기화 중 (0 / "+total_page+")");
                 asyncDialog.setCancelable(false);
                 asyncDialog.setCanceledOnTouchOutside(false);//터치해도 다이얼로그 안 사라짐
 
@@ -65,12 +90,12 @@ public class LoadingActivity extends AppCompatActivity {
             }
 
             @Override
-            protected Object doInBackground(Object[] objects) {
+            protected Void doInBackground(Void... voids) {
                 //강의 정보 다운로드
-                DatabaseLibrary databaseLibrary = DatabaseLibrary.getInstance(null);
+               // DatabaseLibrary databaseLibrary = DatabaseLibrary.getInstance(null);
 
                 //exeception 발생 시
-                if(!databaseLibrary.doUpdate(year, semester))
+                if(!database.doUpdate(year, semester, (current_page) -> publishProgress(current_page)))
                 {
                     SharedPreferences sf = getSharedPreferences("sFile", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sf.edit();
@@ -87,7 +112,15 @@ public class LoadingActivity extends AppCompatActivity {
             }
 
             @Override
-            protected void onPostExecute(Object o) {
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+                int current_page = values[0];
+
+                asyncDialog.setMessage("시간표 동기화 중 ("+current_page+" / "+database.getUrlListSize()+")");
+            }
+
+            @Override
+            protected void onPostExecute(Void o) {
                 super.onPostExecute(o);
 
                 asyncDialog.dismiss();
@@ -115,4 +148,6 @@ public class LoadingActivity extends AppCompatActivity {
         return false;
 
     }
+
+
 }

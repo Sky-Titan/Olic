@@ -22,6 +22,6 @@ public class Myapplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        DatabaseLibrary.getInstance(getApplicationContext());
+        //DatabaseLibrary.getInstance(getApplicationContext());
     }
 }

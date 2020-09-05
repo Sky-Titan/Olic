@@ -41,7 +41,7 @@ public class BuildingListFragment extends Fragment {
     private View view;
     private EditText search_edittext;
 
-    private DatabaseLibrary databaseLibrary;
+   // private DatabaseLibrary databaseLibrary;
 
     public BuildingListFragment() {
         // Required empty public constructor
@@ -54,7 +54,7 @@ public class BuildingListFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_buildinglist,container,false);
 
-        databaseLibrary = DatabaseLibrary.getInstance(null);
+/*        databaseLibrary = DatabaseLibrary.getInstance(null);
 
         setAdView();
 
@@ -62,11 +62,11 @@ public class BuildingListFragment extends Fragment {
 
         setListView();
 
-        loadList("");//초기 리스트 불러오기
+        loadList("");//초기 리스트 불러오기*/
         return view;
     }
 
-    private void setListView() {
+/*    private void setListView() {
         adapter=new BuildingSearchAdapter();
         listView=(ListView)view.findViewById(R.id.searchlist_c);
         listView.setAdapter(adapter);
@@ -197,6 +197,6 @@ public class BuildingListFragment extends Fragment {
             c.close();
         }).start();
     }
-
+*/
 
 }

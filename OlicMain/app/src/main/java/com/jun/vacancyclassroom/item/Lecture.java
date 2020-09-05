@@ -1,106 +1,65 @@
 package com.jun.vacancyclassroom.item;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModel;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.Room;
+
+import org.jsoup.select.Elements;
+
+@Entity
 public class Lecture {
-    String code,title,classroom,time;
-    String unit;//학점
-    String prof_nm;//강의교수
-    String lect_quota;//수강정원
-    String lect_req_cnt;//수강신청인원
-    private int button_color;
 
-    public String getCode() {
-        return code;
+    @PrimaryKey
+    @NonNull
+    public String lecture_code="";
+    public String lecture_name="";
+    public String lecture_credit="";//학점
+    public String professor="";//강의교수
+    public String quota="";//수강정원
+    public String req_cnt="";//수강신청인원
+    public String lecture_room="";
+    public String lecture_time="";
+
+
+    public Lecture(String lecture_code, String lecture_name, String lecture_credit, String professor, String quota, String req_cnt, String lecture_room, String lecture_time) {
+        this.lecture_code = lecture_code;
+        this.lecture_name = lecture_name;
+        this.lecture_credit = lecture_credit;
+        this.professor = professor;
+        this.quota = quota;
+        this.req_cnt = req_cnt;
+        this.lecture_room = lecture_room;
+        this.lecture_time = lecture_time;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    @Override
+    public boolean equals(@Nullable Object obj) {
+
+        Lecture other = (Lecture) obj;
+
+        if(lecture_code.equals(other.lecture_code))
+            return true;
+        return false;
+
     }
 
-    public String getTitle() {
-        return title;
-    }
+    @Ignore
+    public static DiffUtil.ItemCallback<Lecture> DIFF_CALLBACK = new  DiffUtil.ItemCallback<Lecture>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Lecture oldItem, @NonNull Lecture newItem) {
+            return oldItem.lecture_code.equals(newItem.lecture_code);
+        }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+        @Override
+        public boolean areContentsTheSame(@NonNull Lecture oldItem, @NonNull Lecture newItem) {
+            return oldItem.equals(newItem);
+        }
 
-    public String getClassroom() {
-        return classroom;
-    }
-
-    public void setClassroom(String classroom) {
-        this.classroom = classroom;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public String getProf_nm() {
-        return prof_nm;
-    }
-
-    public void setProf_nm(String prof_nm) {
-        this.prof_nm = prof_nm;
-    }
-
-    public String getLect_quota() {
-        return lect_quota;
-    }
-
-    public void setLect_quota(String lect_quota) {
-        this.lect_quota = lect_quota;
-    }
-
-    public String getLect_req_cnt() {
-        return lect_req_cnt;
-    }
-
-    public void setLect_req_cnt(String lect_req_cnt) {
-        this.lect_req_cnt = lect_req_cnt;
-    }
-
-    public int getButton_color() {
-        return button_color;
-    }
-
-    public void setButton_color(int button_color) {
-        this.button_color = button_color;
-    }
-
-    public Lecture() {
-    }
-
-    public Lecture(String code, String title, String classroom, String time)
-    {
-        this.code = code;
-        this.title = title;
-        this.classroom = classroom;
-        this.time = time;
-    }
-
-    public Lecture(String code, String title, String classroom, String time, String unit, String prof_nm, String lect_quota, String lect_req_cnt) {
-        this.code = code;
-        this.title = title;
-        this.classroom = classroom;
-        this.time = time;
-        this.unit = unit;
-        this.prof_nm = prof_nm;
-        this.lect_quota = lect_quota;
-        this.lect_req_cnt = lect_req_cnt;
-    }
-
+    };
 
 }

@@ -19,6 +19,15 @@ public class ListLiveData<T> extends MutableLiveData<ArrayList<T>> {
         setValue(itemList);
     }
 
+    public T get(int index)
+    {
+        return getValue().get(index);
+    }
+    public int size()
+    {
+        return getValue().size();
+    }
+
     public void addAll(ArrayList<T> list) {
         ArrayList<T> itemList = getValue();
         itemList.addAll(list);

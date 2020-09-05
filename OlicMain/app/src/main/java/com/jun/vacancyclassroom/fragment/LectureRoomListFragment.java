@@ -2,10 +2,7 @@ package com.jun.vacancyclassroom.fragment;
 
 
 import android.app.ProgressDialog;
-import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
+import android.app.VoiceInteractor;
 import android.os.Bundle;
 
 
@@ -15,28 +12,35 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Toast;
 
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vacancyclassroom.R;
+import com.example.vacancyclassroom.databinding.FragmentLectureroomlistBinding;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.jun.vacancyclassroom.activity.LoadingActivity;
-import com.jun.vacancyclassroom.adapter.SearchAdapter;
+import com.jun.vacancyclassroom.adapter.LectureRoomListAdapter;
 import com.jun.vacancyclassroom.database.DatabaseLibrary;
-import com.jun.vacancyclassroom.item.SearchItem;
+import com.jun.vacancyclassroom.item.Lecture;
+import com.jun.vacancyclassroom.item.LectureRoom;
+import com.jun.vacancyclassroom.item.ListLiveData;
+import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
-
-import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+import java.util.List;
 
 
 public class LectureRoomListFragment extends Fragment {
 
-    private SearchAdapter adapter;
-    private ListView listView;
+    private static LectureRoomListAdapter adapter;
+    private RecyclerView recyclerView;
     private AdView mAdView;
 
     private View view;
@@ -45,96 +49,53 @@ public class LectureRoomListFragment extends Fragment {
 
     private DatabaseLibrary databaseLibrary;
 
+    private static MainViewModel viewModel;
+
+    private FragmentLectureroomlistBinding binding;
+
     public LectureRoomListFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public void onResume(){
-        super.onResume();
-
-        getChecked();
-
-    }
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view=inflater.inflate(R.layout.fragment_lectureroomlist,container,false);
 
-        databaseLibrary = DatabaseLibrary.getInstance(null);
+        viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_lectureroomlist, container, false);
+        binding.setViewModel(viewModel);
+        binding.setLifecycleOwner(this);
+        view = binding.getRoot();
+
+//        databaseLibrary = DatabaseLibrary.getInstance(null);
 
         setAdView();
 
+        adapter = new LectureRoomListAdapter(getActivity().getApplication(), viewModel);
+
+        //강의실 데이터 변할때마다 호출
+        viewModel.getLectureRooms().observe(getViewLifecycleOwner(), lecturerooms -> {
+            ArrayList<LectureRoom> list = new ArrayList<>(lecturerooms);
+            adapter.submitList(list);
+        });
+
+        //q
+        viewModel.getBookMarkedRoomsData().observe(getViewLifecycleOwner(), bookMarkedRooms -> {
+            adapter.setBookmarkedSet(bookMarkedRooms);
+        });
+
+        binding.lecturelistRecyclerview.setAdapter(adapter);
+
         setSearchEdit();
 
-        adapter=new SearchAdapter();
-
-        setListView();
-
-        loadList("");//초기 리스트 불러오기
-        getChecked();//체크설정
         return view;
     }
 
-    private void setListView() {
 
-        ProgressDialog asyncDialog = new ProgressDialog(
-                getContext(), R.style.AppCompatAlertDialogStyle);
-
-        listView=(ListView)view.findViewById(R.id.searchlist_a);
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener((adapterView, view, i, l) -> {
-
-            SearchItem item=(SearchItem)adapter.getItem(i);
-
-            new AsyncTask<Void, Void, Boolean>(){
-
-                @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
-                }
-
-                @Override
-                protected Boolean doInBackground(Void... voids) {
-                    Cursor cursor = databaseLibrary.selectBookmarkList(item.getClassroom());
-
-                    //만약 즐겨찾기 db에 없다면 추가
-                    if(cursor.getCount()==0)
-                    {
-                        databaseLibrary.insertBookmarkList(item.getClassroom());
-                        cursor.close();
-                        return true;
-                    }
-                    else {//즐겨찾기에 있다면 삭제
-                        databaseLibrary.deleteBookmarkList(item.getClassroom());
-                        cursor.close();
-                        return false;
-                    }
-                }
-
-                @Override
-                protected void onPostExecute(Boolean isAdd) {
-                    super.onPostExecute(isAdd);
-
-                    if(isAdd)
-                    {
-                        listView.setItemChecked(i,true);
-                        Toast.makeText(getContext(),"즐겨찾기에 추가했습니다.",Toast.LENGTH_SHORT).show();
-                    }
-                    else
-                    {
-                        listView.setItemChecked(i,false);
-                        Toast.makeText(getContext(),"즐겨찾기가 해제됐습니다.",Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }.execute();
-        });
-    }
-
+    //검색
     private void setSearchEdit() {
-        //검색
+
         search_edittext=(EditText)view.findViewById(R.id.search_classroom);
         search_edittext.addTextChangedListener(new TextWatcher() {
 
@@ -147,15 +108,30 @@ public class LectureRoomListFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable arg0) {
                 // 입력이 끝났을 때
-                String s=arg0.toString();
+                String searchWord = arg0.toString();
 
-                //새로 어댑터 구성
-                adapter=new SearchAdapter();
-                listView.setAdapter(adapter);
+                List<LectureRoom> list = new ArrayList<>();
 
-                loadList(s);
+                if(searchWord.isEmpty())
+                {
+                    viewModel.getLectureRooms().observe(getViewLifecycleOwner(), lectureRooms -> {
+                        list.addAll(lectureRooms);
+                    });
 
-                getChecked();
+                }
+                else
+                {
+                    viewModel.getLectureRooms().observe(getViewLifecycleOwner(), lectureRooms -> {
+                        for(int i = 0;i < lectureRooms.size();i++)
+                        {
+                            if(lectureRooms.get(i).lecture_room.toLowerCase().contains(searchWord.toLowerCase()))
+                                list.add(lectureRooms.get(i));
+                        }
+                    });
+                }
+
+                //검색
+                adapter.submitList(list);
             }
 
             @Override
@@ -174,7 +150,7 @@ public class LectureRoomListFragment extends Fragment {
     }
 
     //리스트뷰 생성
-    public void loadList(String searching_word)
+/*    public void loadList(String searching_word)
     {
         ProgressDialog asyncDialog = new ProgressDialog(
                 getContext(), R.style.AppCompatAlertDialogStyle);
@@ -228,10 +204,10 @@ public class LectureRoomListFragment extends Fragment {
         }.execute();
 
     }
-
+*/
 
     //체크 되어 있는지 여부
-    private void getChecked(){
+ /*   private void getChecked(){
 
         ProgressDialog asyncDialog = new ProgressDialog(
                 getContext(), R.style.AppCompatAlertDialogStyle);
@@ -263,9 +239,9 @@ public class LectureRoomListFragment extends Fragment {
                 cursor.close();
 
                 for(int i = 0;i<adapter.getCount();i++){
-                    SearchItem item=(SearchItem)adapter.getItem(i);
+                    LectureRoomItem item=(LectureRoomItem)adapter.getItem(i);
 
-                    cursor = databaseLibrary.selectBookmarkList(item.getClassroom());
+                    cursor = databaseLibrary.selectBookmarkList(item.getLectureRoom());
 
                     //만약 즐겨찾기 db에 없다면 체크해제
                     if(cursor.getCount()==0)
@@ -286,7 +262,7 @@ public class LectureRoomListFragment extends Fragment {
                 int index = (int)values[0];
                 boolean check = (boolean)values[1];
 
-                listView.setItemChecked(index, check);
+                recyclerView.setItemChecked(index, check);
             }
 
             @Override
@@ -298,6 +274,6 @@ public class LectureRoomListFragment extends Fragment {
             }
         }.execute();
 
-    }
+    }*/
 
 }

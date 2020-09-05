@@ -3,18 +3,17 @@ package com.jun.vacancyclassroom.fragment;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import androidx.annotation.ColorRes;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -25,10 +24,10 @@ import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.activity.TimeTableActivity;
-import com.jun.vacancyclassroom.adapter.BookMarkAdapter;
+import com.jun.vacancyclassroom.adapter.BookmarkListAdapter;
 import com.jun.vacancyclassroom.database.DatabaseLibrary;
-import com.jun.vacancyclassroom.database.MyDBHelper;
-import com.jun.vacancyclassroom.item.BookMarkItem;
+import com.jun.vacancyclassroom.item.BookMarkedRoom;
+import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,7 +40,7 @@ public class BookmarkListFragment extends Fragment {
     private LinearLayout layout_time;
     private Button currentTime,visibility_time;
 
-    private BookMarkAdapter adapter;
+    private BookmarkListAdapter adapter;
     private ListView listView;
 
     private ArrayList<String> checkedlist = new ArrayList<>();
@@ -54,7 +53,7 @@ public class BookmarkListFragment extends Fragment {
     private NumberPicker dayPicker;
 
     private DatabaseLibrary databaseLibrary;
-
+    private MainViewModel viewModel;
 
     public BookmarkListFragment() {
         // Required empty public constructor
@@ -65,14 +64,14 @@ public class BookmarkListFragment extends Fragment {
         super.onResume();
 
         //화면 돌아올 때 북마크 리스트 새로 구성
-        if(listView!=null)
+  /*      if(listView!=null)
         {
-            adapter=new BookMarkAdapter();
+            adapter=new BookmarkListAdapter();
 
             listView.setAdapter(adapter);
             checkedlist=new ArrayList<String>();
             loadList();
-        }
+        }*/
     }
 
     @Override
@@ -80,8 +79,9 @@ public class BookmarkListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_bookmarklist,container,false);
+        viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
 
-        databaseLibrary = DatabaseLibrary.getInstance(null);
+        /*  databaseLibrary = DatabaseLibrary.getInstance(null);
 
         Calendar now = setTimePicker();
 
@@ -97,20 +97,20 @@ public class BookmarkListFragment extends Fragment {
 
         setListView();
 
-        loadList();
+        loadList();*/
         return view;
     }
 
-    private void setListView() {
-        adapter=new BookMarkAdapter();
+ /*   private void setListView() {
+        adapter=new BookmarkListAdapter();
         listView=(ListView)view.findViewById(R.id.searchlist_b);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
-            BookMarkItem item=(BookMarkItem)adapter.getItem(i);
+            BookMarkedRoom item=(BookMarkedRoom)adapter.getItem(i);
 
             Intent intent = new Intent(getContext(), TimeTableActivity.class);
-            intent.putExtra("classroom",item.getClassroom());
+            intent.putExtra("classroom",item.getLecture_room());
             intent.putExtra("isBuilding",false);
             startActivity(intent);
         });
@@ -155,7 +155,7 @@ public class BookmarkListFragment extends Fragment {
                 timePicker.setMinute(minute);
                 dayPicker.setValue(now.get(Calendar.DAY_OF_WEEK));
 
-                adapter=new BookMarkAdapter();
+                adapter=new BookmarkListAdapter();
                 listView.setAdapter(adapter);
                 loadList();
         });
@@ -168,7 +168,7 @@ public class BookmarkListFragment extends Fragment {
         dayPicker.setMaxValue(7);
         dayPicker.setValue(now.get(Calendar.DAY_OF_WEEK));
         dayPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
-                adapter=new BookMarkAdapter();
+                adapter=new BookmarkListAdapter();
                 listView.setAdapter(adapter);
                 loadList();
         });
@@ -186,7 +186,7 @@ public class BookmarkListFragment extends Fragment {
         timePicker.setMinute(minute);
 
         timePicker.setOnTimeChangedListener((timePicker, i, i1) -> {
-                adapter=new BookMarkAdapter();
+                adapter=new BookmarkListAdapter();
                 listView.setAdapter(adapter);
                 loadList();
         });
@@ -257,11 +257,11 @@ public class BookmarkListFragment extends Fragment {
 
                 for(int i=0;i<checkedlist.size();i++)
                 {
-                    BookMarkItem item=(BookMarkItem)adapter.getItem(i);
+                    BookMarkedRoom item=(BookMarkedRoom)adapter.getItem(i);
                     listView.setItemChecked(i,true);//전부 체크 시켜주기
 
                     //이용가능시 초록색
-                    if(classification(item.getClassroom(),day,hour,minute)==true)
+                    if(classification(item.getLecture_room(),day,hour,minute)==true)
                         item.setButton_color(Color.GREEN);
                         //이용불가시 빨간색
                     else
@@ -417,5 +417,5 @@ public class BookmarkListFragment extends Fragment {
             return "일";
         else
             return "";
-    }
+    }*/
 }

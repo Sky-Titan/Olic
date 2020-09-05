@@ -37,9 +37,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.jun.vacancyclassroom.Test"
-            android:screenOrientation="portrait" />
-        <activity
             android:name="com.jun.vacancyclassroom.activity.MainActivity"
             android:screenOrientation="portrait" />
     </application>

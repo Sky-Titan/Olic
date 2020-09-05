@@ -13,10 +13,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.RoomDatabase;
 
 import com.example.vacancyclassroom.R;
 import com.jun.vacancyclassroom.database.DatabaseLibrary;
 import com.jun.vacancyclassroom.Myapplication;
+import com.jun.vacancyclassroom.database.MyDAO;
+import com.jun.vacancyclassroom.database.MyDatabase;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -26,7 +29,8 @@ public class SplashActivity extends AppCompatActivity {
     private String DBversion;//현재 학기를 db버전으로 사용
     Myapplication myapplication ;
 
-    private DatabaseLibrary databaseLibrary;
+    //private DatabaseLibrary databaseLibrary;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -34,7 +38,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        databaseLibrary = DatabaseLibrary.getInstance(null);
+        //databaseLibrary = DatabaseLibrary.getInstance(null);
 
         myapplication = (Myapplication)getApplication();
 
@@ -95,11 +99,11 @@ public class SplashActivity extends AppCompatActivity {
             //첫사용 혹은 db업데이트 할때
             if(!text.equals(DBversion))
             {
+
                 ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
                 NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
                 if(networkInfo != null && networkInfo.isConnected()) {
-                    databaseLibrary.deleteAllRecords();
 
                     //db업데이트
                     Intent intent = new Intent(SplashActivity.this, LoadingActivity.class);

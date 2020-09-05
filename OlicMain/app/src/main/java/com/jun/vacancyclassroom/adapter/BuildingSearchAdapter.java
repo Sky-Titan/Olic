@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.example.vacancyclassroom.R;
 import com.jun.vacancyclassroom.item.BuildingItem;
-import com.jun.vacancyclassroom.item.SearchItem;
 
 import java.util.ArrayList;
 

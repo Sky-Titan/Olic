@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.vacancyclassroom.R;
-import com.jun.vacancyclassroom.item.BookMarkItem;
 import com.jun.vacancyclassroom.item.Lecture;
 
 import java.util.ArrayList;
@@ -50,13 +49,7 @@ public class LectureAdapter extends BaseAdapter {
         // Data Set(listViewItemList)에서 position에 위치한 데이터 참조 획득
         Lecture lecture = lectureList.get(position);
 
-        // 아이템 내 각 위젯에 데이터 반영
 
-        lecture_code.setText(lecture.getCode());
-        lecture_name.setText(lecture.getTitle());
-        lecture_quota.setText(lecture.getLect_quota());
-        req_quota.setText(lecture.getLect_req_cnt());
-        color_button.setBackgroundColor(lecture.getButton_color());
 
         return convertView;
     }
@@ -75,17 +68,8 @@ public class LectureAdapter extends BaseAdapter {
 
     // 아이템 데이터 추가를 위한 함수. 개발자가 원하는대로 작성 가능.
     public void addItem(String code, String title,String unit , String prof_nm, String time,String lecture_quota, String req_quota, int color) {
-        Lecture item = new Lecture();
 
-        item.setTime(time);
-        item.setProf_nm(prof_nm);
-        item.setUnit(unit);
-        item.setCode(code);
-        item.setTitle(title);
-        item.setLect_quota(lecture_quota);
-        item.setLect_req_cnt(req_quota);
-        item.setButton_color(color);
-        lectureList.add(item);
+
     }
 
 }
