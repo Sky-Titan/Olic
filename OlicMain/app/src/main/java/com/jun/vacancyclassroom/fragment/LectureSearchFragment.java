@@ -11,9 +11,11 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vacancyclassroom.R;
@@ -71,10 +73,16 @@ public class LectureSearchFragment extends Fragment {
                 for(int i = 0;i < searchLectures.size();i++)
                 {
                     //크롤링 해온다.
-                    Lecture lecture = database.searchLecture(searchLectures.get(i).lecture_code);
+                    final String lecture_code = searchLectures.get(i).lecture_code;
+                    Lecture lecture = database.searchLecture(lecture_code);
 
                     if(lecture!=null)
                         lectures.add(lecture);
+                    else
+                    {
+                        viewModel.removeSearchLecture(new SearchLecture(lecture_code));
+                        getActivity().runOnUiThread(() -> Toast.makeText(getContext(), lecture_code+" 강의를 찾을 수 없습니다.",Toast.LENGTH_SHORT).show());
+                    }
                 }
 
                 emitter.onNext(lectures);
@@ -88,10 +96,16 @@ public class LectureSearchFragment extends Fragment {
 
         });
 
+        //구분선 적용
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setAdapter(adapter);
 
+        //자동완성 뷰 설정
         autocomplete = (AutoCompleteTextView) view.findViewById(R.id.add_lecture_autocomplete);
+        autocomplete.setCompletionHint("목록에 없다면 강의 추가 버튼을 눌러주세요.");
 
+        //전체 강의 목록에서 가져온다.
         viewModel.getLectures().observe(getViewLifecycleOwner(), lectures -> {
             ArrayList<String> list = new ArrayList<>();
 
@@ -104,6 +118,12 @@ public class LectureSearchFragment extends Fragment {
                 Log.d(TAG, ((TextView)view1).getText().toString());
                 viewModel.addSearchLecture(new SearchLecture( ((TextView)view1).getText().toString()));
             });
+        });
+
+        //강의 추가 버튼
+        Button add_button = (Button) view.findViewById(R.id.add_lecture_btn);
+        add_button.setOnClickListener(view1 -> {
+            viewModel.addSearchLecture(new SearchLecture(autocomplete.getText().toString()));
         });
 
         return view;

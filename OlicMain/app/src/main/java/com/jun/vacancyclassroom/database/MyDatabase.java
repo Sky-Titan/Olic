@@ -64,14 +64,6 @@ public abstract class MyDatabase extends RoomDatabase {
             final Elements lectureQuota = doc.select("td.lect_quota");//수강정원
             final Elements lectureReq = doc.select("td.lect_req_cnt");//수강신청인원
 
-            //this.lecture_code = lecture_code;
-            //        this.lecture_name = lecture_name;
-            //        this.lecture_credit = lecture_credit;
-            //        this.professor = professor;
-            //        this.quota = quota;
-            //        this.req_cnt = req_cnt;
-            //        this.lecture_room = lecture_room;
-            //        this.lecture_time = lecture_time;
             if(lectureCode.hasText())
             {
                 lecture = new Lecture(lectureCode.get(0).text().trim(), lectureName.get(0).text().trim(), lectureCredit.get(0).text().trim(), lectureProfessor.get(0).text().trim()

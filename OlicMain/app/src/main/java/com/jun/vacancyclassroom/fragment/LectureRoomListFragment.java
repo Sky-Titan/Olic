@@ -66,8 +66,8 @@ public class LectureRoomListFragment extends Fragment {
             adapter.submitList(list);
         });
 
+        //즐겨찾기 데이터
         viewModel.getBookMarkedRoomsData().observe(getViewLifecycleOwner(), bookMarkedRooms -> {
-
             ArrayList<String> list = new ArrayList<>();
 
             for(int i = 0;i < bookMarkedRooms.size();i++)
