@@ -29,6 +29,9 @@ public interface MyDAO {
     @Query("SELECT DISTINCT lecture_time FROM Lecture WHERE lecture_room = :lecture_room")
     public List<String> selectAllLectureTimesIn(String lecture_room);
 
+    @Query("SELECT * FROM Building")
+    public LiveData<List<Building>> selectAllBuildings();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertLecture(Lecture lecture);
 

@@ -35,10 +35,9 @@ public class LectureRoomListAdapter extends ListAdapter<LectureRoom, MyViewHolde
     private MainViewModel viewModel;
     private MyDAO dao;
     private ExecutorService executorService;
-    private String searchWord = "";
 
     private HashSet<String> bookmarkedSet = new HashSet<>();
-    private ArrayList<LectureRoom> lectureRooms = new ArrayList<>();
+
 
     private static final String TAG = "LectureRoomListAdapter";
 
@@ -57,12 +56,6 @@ public class LectureRoomListAdapter extends ListAdapter<LectureRoom, MyViewHolde
         return new MyViewHolder<>(inflater.inflate(R.layout.lectureroomlist_item, parent, false));
     }
 
-    //검색어 지정
-    public void setSearchWord(String searchWord)
-    {
-        this.searchWord = searchWord;
-        notifyDataSetChanged();
-    }
 
     //북마크 변경
     public void setBookmarkedSet(List<String> bookmarkedSet)
@@ -74,7 +67,6 @@ public class LectureRoomListAdapter extends ListAdapter<LectureRoom, MyViewHolde
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder<LectureroomlistItemBinding> holder, int position) {
 
-        Log.i(TAG, "onBindViewHolder : "+getItem(position).lecture_room+" search word : "+searchWord);
 
         LectureRoom lectureRoom = getItem(position);
         holder.binding().setLectureRoom(lectureRoom);

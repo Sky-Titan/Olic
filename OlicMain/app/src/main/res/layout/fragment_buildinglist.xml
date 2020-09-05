@@ -32,11 +32,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <ListView
-        android:id="@+id/searchlist_c"
-        android:choiceMode="multipleChoice"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/buildinglist_recyclerview"
+        app:layout_constrainedHeight="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/search_building"
-        app:layout_constraintBottom_toBottomOf="parent"></ListView>
+        app:layout_constraintBottom_toBottomOf="parent"></androidx.recyclerview.widget.RecyclerView>
 </androidx.constraintlayout.widget.ConstraintLayout>

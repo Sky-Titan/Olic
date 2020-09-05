@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel;
 import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;
 import com.jun.vacancyclassroom.item.BookMarkedRoom;
+import com.jun.vacancyclassroom.item.Building;
 import com.jun.vacancyclassroom.item.Lecture;
 import com.jun.vacancyclassroom.item.LectureRoom;
 import com.jun.vacancyclassroom.item.ListLiveData;
@@ -33,6 +34,11 @@ public class MainViewModel extends ViewModel {
     {
         dao = MyDatabase.getInstance(application).dao();
         executorService = Executors.newSingleThreadExecutor();
+    }
+
+    public LiveData<List<Building>> getBuildings()
+    {
+        return dao.selectAllBuildings();
     }
 
 
