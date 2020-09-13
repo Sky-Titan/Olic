@@ -15,12 +15,10 @@ import com.example.vacancyclassroom.databinding.LectureroomlistItemBinding;
 import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;
 import com.jun.vacancyclassroom.database.MyViewHolder;
-import com.jun.vacancyclassroom.model.BookMarkedRoom;
 import com.jun.vacancyclassroom.model.LectureRoom;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,9 +29,6 @@ public class LectureRoomListAdapter extends ListAdapter<LectureRoom, MyViewHolde
     private MainViewModel viewModel;
     private MyDAO dao;
     private ExecutorService executorService;
-
-    private HashSet<String> bookmarkedSet = new HashSet<>();
-
 
     private static final String TAG = "LectureRoomListAdapter";
 
@@ -59,23 +54,16 @@ public class LectureRoomListAdapter extends ListAdapter<LectureRoom, MyViewHolde
     }
 
 
-    //북마크 변경
-    public void setBookmarkedSet(List<String> bookmarkedSet)
-    {
-        this.bookmarkedSet.clear();
-        this.bookmarkedSet.addAll(bookmarkedSet);
-    }
-
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder<LectureroomlistItemBinding> holder, int position) {
-
+    public void onBindViewHolder(@NonNull MyViewHolder<LectureroomlistItemBinding> holder, int position)
+    {
 
         LectureRoom lectureRoom = getItem(position);
         holder.binding().setLectureRoom(lectureRoom);
 
 
         //북마크 목록에 있음
-        if(bookmarkedSet.contains(holder.binding().getLectureRoom().lecture_room))
+        if(holder.binding().getLectureRoom().isBookMarked)
             holder.binding().checkBox1.setChecked(true);
         else
             holder.binding().checkBox1.setChecked(false);
@@ -86,15 +74,13 @@ public class LectureRoomListAdapter extends ListAdapter<LectureRoom, MyViewHolde
             {
                 Log.i(TAG, "북마크 추가 "+ holder.binding().getLectureRoom().lecture_room);
                 holder.binding().checkBox1.setChecked(true);
-                bookmarkedSet.add(holder.binding().getLectureRoom().lecture_room);
-                viewModel.addBookMarkedRoom(new BookMarkedRoom(holder.binding().getLectureRoom().lecture_room));
+                viewModel.addBookMarkedRoom(holder.binding().getLectureRoom().lecture_room);
             }
             else
             {
                 Log.i(TAG, "북마크 삭제 "+holder.binding().getLectureRoom().lecture_room);
                 holder.binding().checkBox1.setChecked(false);
-                bookmarkedSet.remove(holder.binding().getLectureRoom().lecture_room);
-                viewModel.removeBookMarkedRoom(new BookMarkedRoom(holder.binding().getLectureRoom().lecture_room));
+                viewModel.removeBookMarkedRoom(holder.binding().getLectureRoom().lecture_room);
             }
         });
     }

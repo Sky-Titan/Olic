@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vacancyclassroom.R;
 import com.jun.vacancyclassroom.Myapplication;
+import com.jun.vacancyclassroom.database.MyDatabase;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -23,18 +24,14 @@ import java.util.TimeZone;
 public class SplashActivity extends AppCompatActivity {
 
     private String DBversion;//현재 학기를 db버전으로 사용
+    private String DBname = "DB_Room";
     Myapplication myapplication ;
-
-    //private DatabaseLibrary databaseLibrary;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
-        //databaseLibrary = DatabaseLibrary.getInstance(null);
 
         myapplication = (Myapplication)getApplication();
 
@@ -90,7 +87,7 @@ public class SplashActivity extends AppCompatActivity {
 
             //현재 DB 버전 불러오기
             SharedPreferences sf = getSharedPreferences("sFile",MODE_PRIVATE);
-            String text = sf.getString("DB","");//첫 사용인지 구분
+            String text = sf.getString(DBname,"");//첫 사용인지 구분
 
             //첫사용 혹은 db업데이트 할때
             if(!text.equals(DBversion))
@@ -125,7 +122,7 @@ public class SplashActivity extends AppCompatActivity {
             }
 
             SharedPreferences.Editor editor = sf.edit();
-            editor.putString("DB",DBversion); // key, value를 이용하여 저장하는 형태
+            editor.putString(DBname, DBversion); // key, value를 이용하여 저장하는 형태
 
             //최종 커밋
             editor.commit();

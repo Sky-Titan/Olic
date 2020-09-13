@@ -27,12 +27,18 @@ import android.widget.Toast;
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.jun.vacancyclassroom.database.MyDAO;
+import com.jun.vacancyclassroom.database.MyDatabase;
 import com.jun.vacancyclassroom.fragment.*;
 
 import com.jun.vacancyclassroom.Myapplication;
 import com.jun.vacancyclassroom.adapter.ViewPagerAdapter;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 import com.jun.vacancyclassroom.viewmodel.MainViewModelFactory;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager2 mViewPager;
 
     private static final String TAG = "MainActivity";
-
+    private MyDAO dao;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -57,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         viewModel = new ViewModelProvider(this, new MainViewModelFactory(getApplication())).get(MainViewModel.class);
-
+        dao = MyDatabase.getInstance(this).dao();
 
         Myapplication myapplication = (Myapplication)getApplication();
         setTitle(myapplication.getCurrentSemester());
@@ -116,12 +122,23 @@ public class MainActivity extends AppCompatActivity {
                             int year = Integer.parseInt(version.substring(0,4));
                             String semester = version.substring(4,5);
 
-                            Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
-                            intent.putExtra("semester",semester);
-                            intent.putExtra("year",year);
-                            startActivity(intent);
+                            Observable.create(emitter -> {
+                                dao.deleteAllBuildings();
+                                dao.deleteAllLectures();
+                                dao.deleteAllLectureRooms();
+                                dao.deleteAllSearchLecture();
+                                emitter.onNext("");
+                            }).subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(o -> {
+                                        Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
+                                        intent.putExtra("semester",semester);
+                                        intent.putExtra("year",year);
+                                        startActivity(intent);
 
-                            finish();
+                                        finish();
+                                    });
+
                         }
                         else
                         {

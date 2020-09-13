@@ -13,6 +13,7 @@ public class LectureRoom implements Comparable{
     @PrimaryKey
     @NonNull
     public String lecture_room = "";
+    public boolean isBookMarked = false;
 
     public LectureRoom(String lecture_room) {
         this.lecture_room = lecture_room;
@@ -32,12 +33,12 @@ public class LectureRoom implements Comparable{
     public static DiffUtil.ItemCallback<LectureRoom> DIFF_CALLBACK = new  DiffUtil.ItemCallback<LectureRoom>() {
         @Override
         public boolean areItemsTheSame(@NonNull LectureRoom oldItem, @NonNull LectureRoom newItem) {
-            return oldItem.lecture_room.equals(newItem.lecture_room);
+            return oldItem.lecture_room.equals(newItem.lecture_room) && (oldItem.isBookMarked == newItem.isBookMarked);
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull LectureRoom oldItem, @NonNull LectureRoom newItem) {
-            return oldItem.lecture_room.equals(newItem.lecture_room);
+            return oldItem.lecture_room.equals(newItem.lecture_room) && (oldItem.isBookMarked == newItem.isBookMarked);
         }
 
     };

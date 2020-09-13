@@ -7,7 +7,6 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.jun.vacancyclassroom.model.BookMarkedRoom;
 import com.jun.vacancyclassroom.model.Building;
 import com.jun.vacancyclassroom.model.Lecture;
 import com.jun.vacancyclassroom.model.LectureRoom;
@@ -27,14 +26,14 @@ public interface MyDAO {
     @Query("SELECT * FROM LectureRoom")
     public LiveData<List<LectureRoom>> selectAllLectureRooms();
 
-    @Query("SELECT lecture_room FROM LectureRoom WHERE lecture_room LIKE :building")
-    public LiveData<List<BookMarkedRoom>> selectLectureRooms(String building);
+    @Query("SELECT * FROM LectureRoom WHERE lecture_room LIKE :building")
+    public LiveData<List<LectureRoom>> selectLectureRooms(String building);
 
-    @Query("SELECT * FROM BookMarkedRoom")
-    public LiveData<List<BookMarkedRoom>> selectAllBookMarkedRooms();
+    @Query("SELECT * FROM LectureRoom WHERE isBookMarked = 1")
+    public LiveData<List<LectureRoom>> selectAllBookMarkedRooms();
 
-    @Query("SELECT * FROM BookMarkedRoom WHERE lecture_room = :lecture_room")
-    public LiveData<BookMarkedRoom> selectIFBookmarked(String lecture_room);
+    @Query("SELECT * FROM LectureRoom WHERE lecture_room = :lecture_room AND isBookMarked = 1")
+    public LiveData<LectureRoom> selectIFBookmarked(String lecture_room);
 
     @Query("SELECT * FROM SearchLecture")
     public LiveData<List<SearchLecture>> selectAllSearchLectures();
@@ -57,14 +56,12 @@ public interface MyDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public void insertLectureRoom(LectureRoom lectureRoom);
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public void insertBookMarkedRoom(BookMarkedRoom bookMarkedRoom);
+    @Query("UPDATE LectureRoom SET isBookMarked = 1 WHERE lecture_room = :lectureRoom")
+    public void unBookMarkRoom(String lectureRoom);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public void insertSearchLecture(SearchLecture searchlecture);
 
-    @Query("DELETE FROM BookMarkedRoom")
-    public void deleteAllBookmarkedRooms();
 
     @Query("DELETE FROM Building")
     public void deleteAllBuildings();
@@ -81,8 +78,8 @@ public interface MyDAO {
     @Delete
     public void deleteLecture(Lecture lecture);
 
-    @Delete
-    public void deleteBookMarkedRoom(BookMarkedRoom bookMarkedRoom);
+    @Query("UPDATE LectureRoom SET isBookMarked = 0 WHERE lecture_room = :lectureRoom")
+    public void bookMarkRoom(String lectureRoom);
 
     @Delete
     public void deleteSearchLecture(SearchLecture searchLecture);

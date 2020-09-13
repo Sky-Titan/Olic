@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;
-import com.jun.vacancyclassroom.model.BookMarkedRoom;
 import com.jun.vacancyclassroom.model.LectureRoom;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public class BuildingViewModel extends ViewModel {
     }
 
     //강의실 가져오기
-    public LiveData<List<BookMarkedRoom>> getLectureRooms(String building)
+    public LiveData<List<LectureRoom>> getLectureRooms(String building)
     {
         return dao.selectLectureRooms(building);
     }

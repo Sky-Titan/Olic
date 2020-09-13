@@ -8,16 +8,12 @@ import androidx.lifecycle.ViewModel;
 
 import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;
-import com.jun.vacancyclassroom.model.BookMarkedRoom;
 import com.jun.vacancyclassroom.model.Lecture;
+import com.jun.vacancyclassroom.model.LectureRoom;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public class TimeTableViewModel extends ViewModel {
 
@@ -31,21 +27,21 @@ public class TimeTableViewModel extends ViewModel {
         executorService = Executors.newSingleThreadExecutor();
     }
 
-    public LiveData<BookMarkedRoom> getBookMarked(String lecture_room)
+    public LiveData<LectureRoom> getBookMarked(String lecture_room)
     {
         return dao.selectIFBookmarked(lecture_room);
     }
 
     //즐겨찾기 강의실 추가
-    public void addBookMarkedRoom(BookMarkedRoom bookMarkedRoom)
+    public void addBookMarkedRoom(String bookMarkedRoom)
     {
-        executorService.execute(() -> dao.insertBookMarkedRoom(bookMarkedRoom));
+        executorService.execute(() -> dao.unBookMarkRoom(bookMarkedRoom));
     }
 
     //즐겨찾기 강의실 삭제
-    public void removeBookMarkedRoom(BookMarkedRoom bookMarkedRoom)
+    public void removeBookMarkedRoom(String bookMarkedRoom)
     {
-        executorService.execute(() -> dao.deleteBookMarkedRoom(bookMarkedRoom));
+        executorService.execute(() -> dao.bookMarkRoom(bookMarkedRoom));
     }
 
     public List<Lecture> getLectureList(String lecture_room)

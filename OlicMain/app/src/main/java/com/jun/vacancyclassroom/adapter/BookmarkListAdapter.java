@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -19,7 +18,7 @@ import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;
 import com.jun.vacancyclassroom.database.MyViewHolder;
 
-import com.jun.vacancyclassroom.model.BookMarkedRoom;
+import com.jun.vacancyclassroom.model.LectureRoom;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -30,7 +29,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class BookmarkListAdapter extends ListAdapter<BookMarkedRoom, MyViewHolder<BookmarklistItemBinding>> {
+public class BookmarkListAdapter extends ListAdapter<LectureRoom, MyViewHolder<BookmarklistItemBinding>> {
 
     //private MainViewModel viewModel;
     private Context context;
@@ -42,7 +41,7 @@ public class BookmarkListAdapter extends ListAdapter<BookMarkedRoom, MyViewHolde
 
     public BookmarkListAdapter(Application application, Context context)
     {
-        super(BookMarkedRoom.DIFF_CALLBACK);
+        super(LectureRoom.DIFF_CALLBACK);
         this.dao = MyDatabase.getInstance(application).dao();
         this.context = context;
 
@@ -54,7 +53,7 @@ public class BookmarkListAdapter extends ListAdapter<BookMarkedRoom, MyViewHolde
     }
 
     @Override
-    public void submitList(@Nullable List<BookMarkedRoom> list) {
+    public void submitList(@Nullable List<LectureRoom> list) {
         Collections.sort(list);
         super.submitList(list);
     }

@@ -68,15 +68,6 @@ public class LectureRoomListFragment extends Fragment {
             adapter.submitList(list);
         });
 
-        //즐겨찾기 데이터
-        viewModel.getBookMarkedRoomsData().observe(getViewLifecycleOwner(), bookMarkedRooms -> {
-            ArrayList<String> list = new ArrayList<>();
-
-            for(int i = 0;i < bookMarkedRooms.size();i++)
-                list.add(bookMarkedRooms.get(i).lecture_room);
-            Collections.sort(list);
-            adapter.setBookmarkedSet(list);
-        });
 
         //구분선 적용
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);

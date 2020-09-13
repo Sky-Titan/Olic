@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;
-import com.jun.vacancyclassroom.model.BookMarkedRoom;
 import com.jun.vacancyclassroom.model.Building;
 import com.jun.vacancyclassroom.model.Lecture;
 import com.jun.vacancyclassroom.model.LectureRoom;
@@ -85,21 +84,29 @@ public class MainViewModel extends ViewModel {
     }
 
     //즐겨찾기 강의실 가져오기
-    public LiveData<List<BookMarkedRoom>> getBookMarkedRoomsData()
+    public LiveData<List<LectureRoom>> getBookMarkedRoomsData()
     {
         return dao.selectAllBookMarkedRooms();
     }
 
     //즐겨찾기 강의실 추가
-    public void addBookMarkedRoom(BookMarkedRoom bookMarkedRoom)
+    public void addBookMarkedRoom(String bookMarkedRoom)
     {
-        executorService.execute(() -> dao.insertBookMarkedRoom(bookMarkedRoom));
+        executorService.execute(() -> dao.unBookMarkRoom(bookMarkedRoom));
     }
 
     //즐겨찾기 강의실 삭제
-    public void removeBookMarkedRoom(BookMarkedRoom bookMarkedRoom)
+    public void removeBookMarkedRoom(String bookMarkedRoom)
     {
-        executorService.execute(() -> dao.deleteBookMarkedRoom(bookMarkedRoom));
+        executorService.execute(() -> dao.bookMarkRoom(bookMarkedRoom));
+    }
+
+    public void deleteAllTables()
+    {
+        executorService.execute(() -> dao.deleteAllBuildings());
+        executorService.execute(() -> dao.deleteAllSearchLecture());
+        executorService.execute(() -> dao.deleteAllLectureRooms());
+        executorService.execute(() -> dao.deleteAllLectures());
     }
 
 }

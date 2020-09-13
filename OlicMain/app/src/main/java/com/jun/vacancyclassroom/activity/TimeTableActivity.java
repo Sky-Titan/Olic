@@ -5,11 +5,8 @@ import android.content.Intent;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -21,17 +18,15 @@ import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.Myapplication;
-import com.jun.vacancyclassroom.model.BookMarkedRoom;
 import com.jun.vacancyclassroom.model.Lecture;
+import com.jun.vacancyclassroom.model.LectureRoom;
 import com.jun.vacancyclassroom.viewmodel.TimeTableViewModel;
 import com.jun.vacancyclassroom.viewmodel.TimeTableViewModelFactory;
 
 import org.techtown.timetablelayout.CollegeTimeTableLayout;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 import io.reactivex.Observable;
@@ -91,21 +86,17 @@ public class TimeTableActivity extends AppCompatActivity {
 
     private void setBookMarkStatus() {
 
-        Observer<BookMarkedRoom> observer = new Observer<BookMarkedRoom>() {
-            @Override
-            public void onChanged(BookMarkedRoom bookMarkedRoom) {
-                //북마크에 없음
-                if(bookMarkedRoom == null)
-                {
-                    bookmark_button.setBackground(getDrawable(R.drawable.ripple_lime_green));
-                    bookmark_button.setText("즐겨찾기 추가");
-                }
-                //북마크에 있음
-                else
-                {
-                    bookmark_button.setBackground(getDrawable(R.drawable.ripple_red));
-                    bookmark_button.setText("즐겨찾기 해제");
-                }
+        Observer<LectureRoom> observer = (bookMarkedRoom) -> {
+            //북마크에 없음
+            if(bookMarkedRoom == null)
+            {
+                bookmark_button.setBackground(getDrawable(R.drawable.ripple_lime_green));
+                bookmark_button.setText("즐겨찾기 추가");
+            }
+            //북마크에 있음
+            else {
+                bookmark_button.setBackground(getDrawable(R.drawable.ripple_red));
+                bookmark_button.setText("즐겨찾기 해제");
             }
         };
 
@@ -114,10 +105,10 @@ public class TimeTableActivity extends AppCompatActivity {
         bookmark_button.setOnClickListener(view1 -> {
             //북마크 추가
             if(bookmark_button.getText().equals("즐겨찾기 추가"))
-                viewModel.addBookMarkedRoom(new BookMarkedRoom(lectureRoom));
+                viewModel.addBookMarkedRoom(lectureRoom);
             //북마크해제
             else
-                viewModel.removeBookMarkedRoom(new BookMarkedRoom(lectureRoom));
+                viewModel.removeBookMarkedRoom(lectureRoom);
         });
 
     }

@@ -4,7 +4,7 @@
     <data>
         <variable
             name="item"
-            type="com.jun.vacancyclassroom.model.BookMarkedRoom" />
+            type="com.jun.vacancyclassroom.model.LectureRoom" />
     </data>
 
     <LinearLayout

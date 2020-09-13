@@ -1,7 +1,6 @@
 package com.jun.vacancyclassroom.database;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 
 import androidx.annotation.WorkerThread;
@@ -10,7 +9,6 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 import com.jun.vacancyclassroom.interfaces.UpdateCallback;
-import com.jun.vacancyclassroom.model.BookMarkedRoom;
 import com.jun.vacancyclassroom.model.Building;
 import com.jun.vacancyclassroom.model.Lecture;
 import com.jun.vacancyclassroom.model.LectureRoom;
@@ -22,10 +20,9 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
-@Database(version = 1, entities = {Lecture.class, LectureRoom.class, BookMarkedRoom.class, Building.class, SearchLecture.class})
+@Database(version = 2, entities = {Lecture.class, LectureRoom.class, Building.class, SearchLecture.class})
 public abstract class MyDatabase extends RoomDatabase {
 
     public abstract MyDAO dao();
@@ -89,12 +86,6 @@ public abstract class MyDatabase extends RoomDatabase {
     @WorkerThread
     public boolean doUpdate(int year, String semester, UpdateCallback callback)
     {
-        dao().deleteAllBuildings();
-        dao().deleteAllLectures();
-        dao().deleteAllBookmarkedRooms();
-        dao().deleteAllLectureRooms();
-        dao().deleteAllSearchLecture();
-
         this.semester = year+semester;
 
         url_List.clear();
@@ -133,8 +124,7 @@ public abstract class MyDatabase extends RoomDatabase {
                     StringTokenizer strtok = new StringTokenizer(lectureRoom.get(j).text().trim(), "-");
 
                     if(strtok.hasMoreTokens())
-                    dao().insertBuilding(new Building(strtok.nextToken()));
-                    //(lectureCode TEXT PRIMARY KEY, lectureName TEXT, lectureCredit TEXT, professor TEXT, quota TEXT, peopleNumber TEXT, lectureRoom TEXT, lectureTime TEXT)
+                        dao().insertBuilding(new Building(strtok.nextToken()));
                 }
             }
 
