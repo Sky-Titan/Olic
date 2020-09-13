@@ -23,6 +23,7 @@ import com.jun.vacancyclassroom.adapter.BookmarkListAdapter;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.TimeZone;
 
 
@@ -55,16 +56,17 @@ public class BookmarkListFragment extends Fragment {
         viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
 
 
-        layout_time = (LinearLayout) view.findViewById(R.id.linearLayout_time);
-        visibility_time = (Button) view.findViewById(R.id.visible_btn);
-        currentTime = (Button) view.findViewById(R.id.currentTime_btn);
-        dayPicker = (NumberPicker) view.findViewById(R.id.dayPicker);
-        timePicker = (TimePicker) view.findViewById(R.id.timePicker);//타임픽커 현재 시간으로 설정
+        layout_time = view.findViewById(R.id.linearLayout_time);
+        visibility_time = view.findViewById(R.id.visible_btn);
+        currentTime = view.findViewById(R.id.currentTime_btn);
+        dayPicker = view.findViewById(R.id.dayPicker);
+        timePicker = view.findViewById(R.id.timePicker);//타임픽커 현재 시간으로 설정
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.bookmakrlist_recyclerview);
+        RecyclerView recyclerView = view.findViewById(R.id.bookmakrlist_recyclerview);
 
-        adapter = new BookmarkListAdapter(viewModel, getContext());
+        adapter = new BookmarkListAdapter(getActivity().getApplication(), getContext());
         viewModel.getBookMarkedRoomsData().observe(getViewLifecycleOwner(), bookmakredrooms -> {
+            Collections.sort(bookmakredrooms);
             adapter.submitList(bookmakredrooms);
         });
 
@@ -157,7 +159,7 @@ public class BookmarkListFragment extends Fragment {
     }
 
     private void setAdView() {
-        mAdView = (AdView) view.findViewById(R.id.adView2);
+        mAdView = view.findViewById(R.id.adView2);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();

@@ -8,7 +8,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class Building {
+public class Building implements Comparable{
 
     @PrimaryKey
     @NonNull
@@ -40,4 +40,9 @@ public class Building {
             return oldItem.buildingName.equals(newItem.buildingName);
         }
     };
+
+    @Override
+    public int compareTo(Object o) {
+        return buildingName.compareTo(((Building)o).buildingName);
+    }
 }

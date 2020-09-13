@@ -67,7 +67,7 @@ public class LectureSearchFragment extends Fragment {
 
         database = MyDatabase.getInstance(getContext());
 
-        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.lecturesearch_recyclerview);
+        RecyclerView recyclerView = view.findViewById(R.id.lecturesearch_recyclerview);
 
         adapter = new SearchLectureAdapter(getContext(), viewModel);
 
@@ -84,7 +84,7 @@ public class LectureSearchFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         //자동완성 뷰 설정
-        autocomplete = (AutoCompleteTextView) view.findViewById(R.id.add_lecture_autocomplete);
+        autocomplete = view.findViewById(R.id.add_lecture_autocomplete);
         autocomplete.setCompletionHint("목록에 없다면 강의 추가 버튼을 눌러주세요.");
 
         //전체 강의 목록에서 가져온다.
@@ -103,7 +103,7 @@ public class LectureSearchFragment extends Fragment {
         });
 
         //강의 추가 버튼
-        Button add_button = (Button) view.findViewById(R.id.add_lecture_btn);
+        Button add_button = view.findViewById(R.id.add_lecture_btn);
         add_button.setOnClickListener(view1 -> {
             viewModel.addSearchLecture(new SearchLecture(autocomplete.getText().toString()));
         });

@@ -1,133 +1,118 @@
 package com.jun.vacancyclassroom.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.vacancyclassroom.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.jun.vacancyclassroom.database.DatabaseLibrary;
-import com.jun.vacancyclassroom.database.MyDBHelper;
 import com.jun.vacancyclassroom.Myapplication;
+import com.jun.vacancyclassroom.model.BookMarkedRoom;
+import com.jun.vacancyclassroom.viewmodel.TimeTableViewModel;
+import com.jun.vacancyclassroom.viewmodel.TimeTableViewModelFactory;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
+import org.techtown.timetablelayout.CollegeTimeTableLayout;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class TimeTableActivity extends AppCompatActivity {
 
     private AdView mAdView;
-    private Button bookmark;
-    private Button isPossibleButton;
+    private Button bookmark_button;
+    private Button isPossible_button;
 
     private Boolean isBookMarked;
     private TextView classroom_textview;
-    private String classroom;
+    private String lectureRoom;
 
     private View view;
+    private CollegeTimeTableLayout timeTableLayout;
 
-    private DatabaseLibrary databaseLibrary;
+    private TimeTableViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = getLayoutInflater().from(this).inflate(R.layout.activity_time_table,null);
 
-        databaseLibrary = DatabaseLibrary.getInstance(null);
-
         Myapplication myapplication = (Myapplication)getApplication();
         setTitle(myapplication.getCurrentSemester());
         setContentView(view);
 
+        viewModel = new ViewModelProvider(this, new TimeTableViewModelFactory(getApplication())).get(TimeTableViewModel.class);
+
         //표시할 강의실 이름 가져옴
         Intent intent = getIntent();
-        classroom = intent.getExtras().getString("classroom");
+        lectureRoom = intent.getExtras().getString("classroom");
+
+        timeTableLayout = findViewById(R.id.timetable_layout);
+        setTimeTable();
 
         //강의실 이름 설정
-        classroom_textview = (TextView) findViewById(R.id.classroom_name_timetable);
-        classroom_textview.setText(classroom);
+        classroom_textview = findViewById(R.id.classroom_name_timetable);
+        classroom_textview.setText(lectureRoom);
 
         //애드뷰 설정
         setAdView();
 
         //북마크 상태 설정
+        bookmark_button = findViewById(R.id.bookmarkButton_timetable);
         setBookMarkStatus();
+
+        //이용 가능 상태 설정
+        isPossible_button = findViewById(R.id.isPossibleButton_timetable);
+
 
         makeTimeTable();
     }
 
     private void setBookMarkStatus() {
 
-        new AsyncTask<Void, Void, Boolean>()
-        {
+        Observer<BookMarkedRoom> observer = new Observer<BookMarkedRoom>() {
             @Override
-            protected Boolean doInBackground(Void... voids) {
-                Cursor c = databaseLibrary.selectBookmarkList(classroom);
-
-                if(c.getCount()==0)
+            public void onChanged(BookMarkedRoom bookMarkedRoom) {
+                //북마크에 없음
+                if(bookMarkedRoom == null)
                 {
-                    c.close();
-                    return false;
+                    bookmark_button.setBackground(getDrawable(R.drawable.ripple_lime_green));
+                    bookmark_button.setText("즐겨찾기 추가");
                 }
+                //북마크에 있음
                 else
                 {
-                    c.close();
-                    return true;
+                    bookmark_button.setBackground(getDrawable(R.drawable.ripple_red));
+                    bookmark_button.setText("즐겨찾기 해제");
                 }
             }
+        };
 
-            @Override
-            protected void onPostExecute(Boolean aBoolean) {
-                super.onPostExecute(aBoolean);
+        viewModel.getBookMarked(lectureRoom).observe(this, observer);
 
-                //즐겨찾기 해제
-                bookmark = (Button)findViewById(R.id.bookmarkButton_timetable);
-
-                if(!aBoolean)
-                {
-                    isBookMarked = false;
-                    bookmark.setText("즐겨찾기 추가");
-                }
-                else
-                {
-                    isBookMarked = true;
-                    bookmark.setText("즐겨찾기 해제");
-                }
-
-                //즐겨찾기 버튼 클릭 리스너
-                bookmark.setOnClickListener(view -> {
-                    if(isBookMarked == true) {
-
-                        new Thread(() -> databaseLibrary.deleteBookmarkList(classroom)).start();
-                        Toast.makeText(getApplicationContext(), "즐겨찾기가 해제됐습니다.", Toast.LENGTH_SHORT).show();
+        bookmark_button.setOnClickListener(view1 -> {
+                    //북마크 추가
+                    if(bookmark_button.getText().equals("즐겨찾기 추가"))
+                    {
+                        viewModel.addBookMarkedRoom(new BookMarkedRoom(lectureRoom));
                     }
+                    //북마크해제
                     else
                     {
-                        new Thread(() -> databaseLibrary.insertBookmarkList(classroom)).start();
-                        Toast.makeText(getApplicationContext(), "즐겨찾기에 추가됐습니다.", Toast.LENGTH_SHORT).show();
+                        viewModel.removeBookMarkedRoom(new BookMarkedRoom(lectureRoom));
                     }
-                    finish();
-                });
-            }
-
-
-        }.execute();
+        });
 
     }
 
@@ -141,9 +126,47 @@ public class TimeTableActivity extends AppCompatActivity {
         mAdView.loadAd(adRequest);
     }
 
+    private void setTimeTable()
+    {
+        //행이름 설정
+        String[] rowNames = new String[timeTableLayout.getRowCount()];
+
+        rowNames[0] = "";
+
+        int time = 9;
+        for(int i = 1;i < rowNames.length;i += 2)
+        {
+            rowNames[i] = "";
+            if(time < 10)
+                rowNames[i] = "0";
+
+            rowNames[i] += time + ":";
+            rowNames[i] += "00";
+            time ++;
+        }
+
+        time = 9;
+        for(int i = 2;i < rowNames.length;i += 2)
+        {
+            rowNames[i] = "";
+            if(time < 10)
+                rowNames[i] = "0";
+
+            rowNames[i] += time + ":";
+            rowNames[i] += "30";
+            time ++;
+        }
+
+        timeTableLayout.setRowNames(rowNames);
+
+        //열이름 설정
+        String[] columnNames = {"","월","화","수","목","금"};
+        timeTableLayout.setColumnNames(columnNames);
+    }
+
     public void makeTimeTable()
     {
-        new AsyncTask<Void, Void, Cursor>()
+    /*    new AsyncTask<Void, Void, Cursor>()
         {
             @Override
             protected Cursor doInBackground(Void... voids) {
@@ -213,7 +236,7 @@ public class TimeTableActivity extends AppCompatActivity {
                 }
             }
         }.execute();
-
+*/
     }
 
     private String calculateSpanCells(String before_hour, String before_minute, String day, String after_hour, String after_minute) {
@@ -286,7 +309,7 @@ public class TimeTableActivity extends AppCompatActivity {
     //병합된 셀들 제거 작업 result수만큼 제거
     private void deleteCellsBeforeSpan(String day, int before_hour_num, int before_minute_num, int result) {
 
-        for(int j = 0;j < result - 1; j++)
+      /*  for(int j = 0;j < result - 1; j++)
         {
             String delete_cell_hour = before_minute_num == 30 ? ( before_hour_num + 1 < 10 ? "0" + String.valueOf(before_hour_num + 1) : String.valueOf(before_hour_num + 1)) : (before_hour_num < 10 ? "0" + String.valueOf(before_hour_num) : String.valueOf(before_hour_num) );
             before_hour_num = before_minute_num == 30 ? before_hour_num + 1 : before_hour_num;
@@ -299,20 +322,20 @@ public class TimeTableActivity extends AppCompatActivity {
 
             GridLayout gridLayout2 = (GridLayout)view.findViewById(R.id.gridlayout_timetable);
             gridLayout2.removeView(deleteCell);
-        }
+        }*/
     }
-
+/*
     private void setPossibleBtn() {
         //가능여부 색깔 표시 버튼
-        isPossibleButton = (Button)findViewById(R.id.isPossibleButton_timetable);
+        isPossible_button = (Button)findViewById(R.id.isPossibleButton_timetable);
 
         //버튼 색깔 판정
         if(classification(classroom))//이용가능시 초록색
-            isPossibleButton.setBackgroundColor(Color.GREEN);
+            isPossible_button.setBackgroundColor(Color.GREEN);
         else//이용불가시 빨간색
-            isPossibleButton.setBackgroundColor(Color.RED);
+            isPossible_button.setBackgroundColor(Color.RED);
     }
-
+*/
     public int dayToNum(String day)
     {
         if (day.equals("월"))
@@ -334,7 +357,7 @@ public class TimeTableActivity extends AppCompatActivity {
     }
 
     //현재 시간 기준 이용가능 여부 판단
-    public boolean classification(String lectureRoom) {
+ /*   public boolean classification(String lectureRoom) {
 
         boolean isPossible = true;
 
@@ -345,9 +368,9 @@ public class TimeTableActivity extends AppCompatActivity {
                 @Override
                 protected Boolean doInBackground(Void... voids) {
                     Cursor c = databaseLibrary.selectLectureRoomList(lectureRoom);
-        /*
+
         현재 시간 불러오기
-         */
+
                     boolean isPossible = true;
 
                     TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
@@ -465,7 +488,7 @@ public class TimeTableActivity extends AppCompatActivity {
 
 
         return isPossible;
-    }
+    }*/
 
     public String dayToKorean(int day) {
 

@@ -9,7 +9,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class BookMarkedRoom {
+public class BookMarkedRoom implements Comparable{
 
     @PrimaryKey
     @NonNull
@@ -43,4 +43,10 @@ public class BookMarkedRoom {
         }
 
     };
+
+    @Override
+    public int compareTo(Object o) {
+
+        return lecture_room.compareTo(((BookMarkedRoom) o).lecture_room);
+    }
 }

@@ -1,5 +1,6 @@
 package com.jun.vacancyclassroom.adapter;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.ListAdapter;
 import com.example.vacancyclassroom.R;
 import com.example.vacancyclassroom.databinding.BookmarklistItemBinding;
 import com.jun.vacancyclassroom.activity.TimeTableActivity;
+import com.jun.vacancyclassroom.database.MyDAO;
+import com.jun.vacancyclassroom.database.MyDatabase;
 import com.jun.vacancyclassroom.database.MyViewHolder;
 
 import com.jun.vacancyclassroom.model.BookMarkedRoom;
@@ -27,17 +30,18 @@ import io.reactivex.schedulers.Schedulers;
 
 public class BookmarkListAdapter extends ListAdapter<BookMarkedRoom, MyViewHolder<BookmarklistItemBinding>> {
 
-    private MainViewModel viewModel;
+    //private MainViewModel viewModel;
     private Context context;
 
     private int hour, minute, day;
 
     private static final String TAG = "BookmarkListAdapter";
+    private MyDAO dao;
 
-    public BookmarkListAdapter(MainViewModel viewModel, Context context)
+    public BookmarkListAdapter(Application application, Context context)
     {
         super(BookMarkedRoom.DIFF_CALLBACK);
-        this.viewModel = viewModel;
+        this.dao = MyDatabase.getInstance(application).dao();
         this.context = context;
 
         TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
@@ -69,7 +73,7 @@ public class BookmarkListAdapter extends ListAdapter<BookMarkedRoom, MyViewHolde
         holder.binding().setItem(getItem(position));
 
         Observable.create(emitter -> {
-            emitter.onNext(viewModel.getTimeListOf(getItem(position).lecture_room));
+            emitter.onNext(dao.selectAllLectureTimesIn(getItem(position).lecture_room));
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -120,14 +124,14 @@ public class BookmarkListAdapter extends ListAdapter<BookMarkedRoom, MyViewHolde
             {
                 if (i % 3 == 0)//새로운 시간대 beforetime(시작시간)이랑 요일구하기
                 {
-                                //ex)화16:00
-                                day = times[i].substring(0, 1);
-                                before_hour = times[i].substring(1, 3);
-                                before_minute = times[i].substring(4, 6);
+                    //ex)화16:00
+                    day = times[i].substring(0, 1);
+                    before_hour = times[i].substring(1, 3);
+                    before_minute = times[i].substring(4, 6);
                 }
                 else if (i % 3 == 2)//aftertime(종료시간) 구하기
                 {
-                                // ex)16:00
+                    // ex)16:00
                     after_hour = times[i].substring(0, 2);
                     after_minute = times[i].substring(3, 5);
 

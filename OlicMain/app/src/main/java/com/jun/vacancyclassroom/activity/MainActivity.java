@@ -65,14 +65,14 @@ public class MainActivity extends AppCompatActivity {
         MobileAds.initialize(this, "ca-app-pub-7245602797811817~6821353940");
 
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         setViewPager();
     }
 
     private void setViewPager() {
-        mViewPager=(ViewPager2) findViewById(R.id.fragment_container);
+        mViewPager = findViewById(R.id.fragment_container);
         mViewPager.setUserInputEnabled(false);//터치 스와이프 못하게 하기
 
         setupViewPagerAdapter(mViewPager);

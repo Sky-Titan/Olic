@@ -42,7 +42,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
 
-    implementation 'com.github.Sky-Titan:CollegeTimeTableLayout:0.1-beta'
+    implementation 'com.github.Sky-Titan:CollegeTimeTableLayout:0.3-test'
     implementation files('libs/jsoup-1.11.3.jar')
 
     def room_version = "2.2.5"

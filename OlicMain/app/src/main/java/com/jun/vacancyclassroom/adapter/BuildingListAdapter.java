@@ -33,6 +33,8 @@ public class BuildingListAdapter extends ListAdapter<Building, MyViewHolder<Buil
     {
         super(Building.DIFF_CALLBACK);
         this.viewModel = viewModel;
+        this.context = context;
+
         dao = MyDatabase.getInstance(context).dao();
 
         executorService = Executors.newSingleThreadExecutor();

@@ -24,8 +24,14 @@ public interface MyDAO {
     @Query("SELECT * FROM LectureRoom")
     public LiveData<List<LectureRoom>> selectAllLectureRooms();
 
+    @Query("SELECT lecture_room FROM LectureRoom WHERE lecture_room LIKE :building")
+    public LiveData<List<BookMarkedRoom>> selectLectureRooms(String building);
+
     @Query("SELECT * FROM BookMarkedRoom")
     public LiveData<List<BookMarkedRoom>> selectAllBookMarkedRooms();
+
+    @Query("SELECT * FROM BookMarkedRoom WHERE lecture_room = :lecture_room")
+    public LiveData<BookMarkedRoom> selectIFBookmarked(String lecture_room);
 
     @Query("SELECT * FROM SearchLecture")
     public LiveData<List<SearchLecture>> selectAllSearchLectures();

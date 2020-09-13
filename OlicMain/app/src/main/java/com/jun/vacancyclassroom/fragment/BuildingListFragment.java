@@ -23,6 +23,7 @@ import com.jun.vacancyclassroom.model.Building;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -53,9 +54,10 @@ public class BuildingListFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.buildinglist_recyclerview);
 
         viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
-        adapter = new BuildingListAdapter(getContext(), viewModel);
+        adapter = new BuildingListAdapter(getActivity(), viewModel);
 
         viewModel.getBuildings().observe(getViewLifecycleOwner(), buildings -> {
+            Collections.sort(buildings);
             adapter.submitList(buildings);
         });
 
@@ -111,6 +113,7 @@ public class BuildingListFragment extends Fragment {
                 }
 
                 //리스트 업데이트
+                Collections.sort(list);
                 adapter.submitList(list);
             }
 

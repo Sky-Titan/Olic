@@ -8,7 +8,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class LectureRoom {
+public class LectureRoom implements Comparable{
 
     @PrimaryKey
     @NonNull
@@ -41,4 +41,10 @@ public class LectureRoom {
         }
 
     };
+
+    @Override
+    public int compareTo(Object o) {
+
+        return lecture_room.compareTo(((LectureRoom) o).lecture_room);
+    }
 }

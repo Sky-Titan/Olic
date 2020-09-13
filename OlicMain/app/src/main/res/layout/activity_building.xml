@@ -28,18 +28,19 @@
         android:textColor="@color/black"
         android:textAlignment="center"
         android:gravity="center"
+        android:layout_marginVertical="5dp"
         app:layout_constraintTop_toBottomOf="@id/adView5"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp" />
 
-    <ListView
-        android:id="@+id/classroomlist_buildingActivity"
-        android:choiceMode="multipleChoice"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/lectureBuilding_recyclerview"
+        app:layout_constrainedHeight="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_width="match_parent"
-        android:layout_weight="13"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/buildingName_buildingActivity"
         app:layout_constraintBottom_toBottomOf="parent"
-        ></ListView>
+        ></androidx.recyclerview.widget.RecyclerView>
 </androidx.constraintlayout.widget.ConstraintLayout>

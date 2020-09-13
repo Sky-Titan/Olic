@@ -25,6 +25,7 @@ import com.jun.vacancyclassroom.model.LectureRoom;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -63,6 +64,7 @@ public class LectureRoomListFragment extends Fragment {
         //강의실 데이터 변할때마다 호출
         viewModel.getLectureRooms().observe(getViewLifecycleOwner(), lecturerooms -> {
             ArrayList<LectureRoom> list = new ArrayList<>(lecturerooms);
+            Collections.sort(list);
             adapter.submitList(list);
         });
 
@@ -72,7 +74,7 @@ public class LectureRoomListFragment extends Fragment {
 
             for(int i = 0;i < bookMarkedRooms.size();i++)
                 list.add(bookMarkedRooms.get(i).lecture_room);
-
+            Collections.sort(list);
             adapter.setBookmarkedSet(list);
         });
 
@@ -90,7 +92,7 @@ public class LectureRoomListFragment extends Fragment {
     //검색창 설정
     private void setSearchEdit() {
 
-        search_edittext=(EditText)view.findViewById(R.id.search_classroom);
+        search_edittext = view.findViewById(R.id.search_classroom);
         search_edittext.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -125,6 +127,7 @@ public class LectureRoomListFragment extends Fragment {
                     });
                 }
 
+                Collections.sort(list);
                 //리스트 업데이트
                 adapter.submitList(list);
             }
@@ -137,7 +140,7 @@ public class LectureRoomListFragment extends Fragment {
     }
 
     private void setAdView() {
-        mAdView = (AdView) view.findViewById(R.id.adView1);
+        mAdView = view.findViewById(R.id.adView1);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
