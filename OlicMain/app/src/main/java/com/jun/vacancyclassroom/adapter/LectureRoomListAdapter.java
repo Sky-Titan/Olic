@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.vacancyclassroom.R;
@@ -18,6 +19,7 @@ import com.jun.vacancyclassroom.model.BookMarkedRoom;
 import com.jun.vacancyclassroom.model.LectureRoom;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -41,6 +43,12 @@ public class LectureRoomListAdapter extends ListAdapter<LectureRoom, MyViewHolde
         dao = MyDatabase.getInstance(application).dao();
         this.viewModel = viewModel;
         executorService = Executors.newSingleThreadExecutor();
+    }
+
+    @Override
+    public void submitList(@Nullable List<LectureRoom> list) {
+        Collections.sort(list);
+        super.submitList(list);
     }
 
     @NonNull

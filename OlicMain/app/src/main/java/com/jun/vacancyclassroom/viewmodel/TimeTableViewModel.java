@@ -9,7 +9,9 @@ import androidx.lifecycle.ViewModel;
 import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;
 import com.jun.vacancyclassroom.model.BookMarkedRoom;
+import com.jun.vacancyclassroom.model.Lecture;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,5 +46,15 @@ public class TimeTableViewModel extends ViewModel {
     public void removeBookMarkedRoom(BookMarkedRoom bookMarkedRoom)
     {
         executorService.execute(() -> dao.deleteBookMarkedRoom(bookMarkedRoom));
+    }
+
+    public List<Lecture> getLectureList(String lecture_room)
+    {
+        return dao.selectAllLectureIn(lecture_room);
+    }
+
+    public Lecture getLecture(String code)
+    {
+        return dao.selectLecture(code);
     }
 }

@@ -3,13 +3,16 @@ package com.jun.vacancyclassroom.activity;
 import android.content.Intent;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,10 +22,17 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.Myapplication;
 import com.jun.vacancyclassroom.model.BookMarkedRoom;
+import com.jun.vacancyclassroom.model.Lecture;
 import com.jun.vacancyclassroom.viewmodel.TimeTableViewModel;
 import com.jun.vacancyclassroom.viewmodel.TimeTableViewModelFactory;
 
 import org.techtown.timetablelayout.CollegeTimeTableLayout;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -34,7 +44,6 @@ public class TimeTableActivity extends AppCompatActivity {
     private Button bookmark_button;
     private Button isPossible_button;
 
-    private Boolean isBookMarked;
     private TextView classroom_textview;
     private String lectureRoom;
 
@@ -42,6 +51,7 @@ public class TimeTableActivity extends AppCompatActivity {
     private CollegeTimeTableLayout timeTableLayout;
 
     private TimeTableViewModel viewModel;
+    private static final String TAG = "TimeTableActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +84,7 @@ public class TimeTableActivity extends AppCompatActivity {
 
         //이용 가능 상태 설정
         isPossible_button = findViewById(R.id.isPossibleButton_timetable);
-
+        isPossible_button.setBackgroundColor(Color.GREEN);
 
         makeTimeTable();
     }
@@ -102,16 +112,12 @@ public class TimeTableActivity extends AppCompatActivity {
         viewModel.getBookMarked(lectureRoom).observe(this, observer);
 
         bookmark_button.setOnClickListener(view1 -> {
-                    //북마크 추가
-                    if(bookmark_button.getText().equals("즐겨찾기 추가"))
-                    {
-                        viewModel.addBookMarkedRoom(new BookMarkedRoom(lectureRoom));
-                    }
-                    //북마크해제
-                    else
-                    {
-                        viewModel.removeBookMarkedRoom(new BookMarkedRoom(lectureRoom));
-                    }
+            //북마크 추가
+            if(bookmark_button.getText().equals("즐겨찾기 추가"))
+                viewModel.addBookMarkedRoom(new BookMarkedRoom(lectureRoom));
+            //북마크해제
+            else
+                viewModel.removeBookMarkedRoom(new BookMarkedRoom(lectureRoom));
         });
 
     }
@@ -166,80 +172,78 @@ public class TimeTableActivity extends AppCompatActivity {
 
     public void makeTimeTable()
     {
-    /*    new AsyncTask<Void, Void, Cursor>()
-        {
-            @Override
-            protected Cursor doInBackground(Void... voids) {
-                return databaseLibrary.selectLectureRoomList(classroom);
-            }
+        io.reactivex.Observable.create(emitter -> {
+            emitter.onNext(viewModel.getLectureList(lectureRoom));
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(o -> {
+                    List<Lecture> lectureList = (List<Lecture>) o;
 
-            @Override
-            protected void onPostExecute(Cursor cursor) {
-                super.onPostExecute(cursor);
-
-                String time="";
-
-                while (cursor.moveToNext())
-                    time = cursor.getString(1);
-
-                cursor.close();
-
-                //이용가능상태 색깔 설정
-                setPossibleBtn();
-
-                // 시간표 표시
-                StringTokenizer tokens = new StringTokenizer(time, " ");
-                String[] times = new String[tokens.countTokens()];
-                String before_hour = "", before_minute = "";
-                String day = "";
-                String after_hour = "", after_minute = "";
-
-                for (int i = 0; i < times.length; i++)
-                {
-                    if (i == 0)
+                    for(int k = 0;k < lectureList.size();k++)
                     {
-                        times[i] = tokens.nextToken();//ex)화16:00
+                        String[] times = lectureList.get(k).lecture_time.split(" ");
 
-                        day = times[i].substring(0, 1);
-                        before_hour = times[i].substring(1, 3);
-                        before_minute = times[i].substring(4, 6);
 
+                        String before_hour = "", before_minute = "";
+                        String day = "";
+                        String after_hour = "", after_minute = "";
+
+                        for (int i = 0; i < times.length; i++)
+                        {
+                            if (i % 3 == 0)//새로운 시간대 beforetime(시작시간)이랑 요일구하기
+                            {
+                                //ex)화16:00
+                                //요일
+                                day = times[i].substring(0, 1);
+
+                                //시작 시간
+                                before_hour = times[i].substring(1, 3);
+                                before_minute = times[i].substring(4, 6);
+                            }
+                            else if (i % 3 == 2)//aftertime 구하기 (종료시간)
+                            {
+                                // ex)16:00
+                                //종료시간
+                                after_hour = times[i].substring(0, 2);
+                                after_minute = times[i].substring(3, 5);
+
+                                setUsable(before_hour, before_minute, after_hour, after_minute, day);
+                                calculateSpanCells(before_hour, before_minute, day, after_hour, after_minute, lectureList.get(k));
+                            }
+                        }
                     }
-                    else if (i % 3 == 0)//새로운 시간대 beforetime(시작시간)이랑 요일구하기
-                    {
-                        times[i] = tokens.nextToken();//ex)화16:00
+                });
 
-                        //요일
-                        day = times[i].substring(0, 1);
-
-                        //시작 시간
-                        before_hour = times[i].substring(1, 3);
-                        before_minute = times[i].substring(4, 6);
-                    }
-                    else if (i % 3 == 2)//aftertime 구하기 (종료시간)
-                    {
-                        times[i] = tokens.nextToken();// ex)16:00
-
-                        //종료시간
-                        after_hour = times[i].substring(0, 2);
-                        after_minute = times[i].substring(3, 5);
-
-
-                        before_hour = calculateSpanCells(before_hour, before_minute, day, after_hour, after_minute);
-
-                    }
-                    else if (i % 3 == 1)
-                    {//~
-                        times[i] = tokens.nextToken();
-                    }
-
-                }
-            }
-        }.execute();
-*/
     }
 
-    private String calculateSpanCells(String before_hour, String before_minute, String day, String after_hour, String after_minute) {
+    //강의실 이용가능 여부 판단
+    private void setUsable(String before_hour, String before_minute, String after_hour, String after_minute, String day)
+    {
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+
+        Calendar before = Calendar.getInstance(timeZone);
+        before.set(Calendar.DAY_OF_WEEK, dayToNum(day));
+        before.set(Calendar.HOUR_OF_DAY, Integer.parseInt(before_hour));
+        before.set(Calendar.MINUTE, Integer.parseInt(before_minute));
+        //Log.d(TAG, "BEFORE : "+before.get(Calendar.DATE)+" "+dayToKorean(before.get(Calendar.DAY_OF_WEEK))+ " "+before.get(Calendar.HOUR_OF_DAY)+" "+before.get(Calendar.MINUTE));
+
+        Calendar after = Calendar.getInstance(timeZone);
+        after.set(Calendar.DAY_OF_WEEK, dayToNum(day));
+        after.set(Calendar.HOUR_OF_DAY, Integer.parseInt(after_hour));
+        after.set(Calendar.MINUTE, Integer.parseInt(after_minute));
+        //Log.d(TAG, "AFTER : "+dayToKorean(after.get(Calendar.DAY_OF_WEEK))+ " "+after.get(Calendar.HOUR_OF_DAY)+" "+after.get(Calendar.MINUTE));
+
+        Calendar now = Calendar.getInstance(timeZone);
+        //Log.d(TAG, "NOW : "+now.get(Calendar.DATE)+" "+dayToKorean(now.get(Calendar.DAY_OF_WEEK))+ " "+now.get(Calendar.HOUR_OF_DAY)+" "+now.get(Calendar.MINUTE));
+
+        if( before.compareTo(now) <= 0 && after.compareTo(now) >= 0)
+        {
+            isPossible_button.setBackgroundColor(Color.RED);
+        }
+    }
+
+    private void calculateSpanCells(String before_hour, String before_minute, String day, String after_hour, String after_minute, Lecture lecture) {
         //숫자로변경
         int before_hour_num = Integer.parseInt(before_hour);
         int after_hour_num = Integer.parseInt(after_hour);
@@ -248,7 +252,7 @@ public class TimeTableActivity extends AppCompatActivity {
 
         //토,일요일은 제외
         if(day.equals("토") || day.equals("일"))
-            return before_hour;
+            return ;
 
         //최소 시간 오전 9시00분
         if(before_hour_num < 9)
@@ -260,9 +264,7 @@ public class TimeTableActivity extends AppCompatActivity {
         if(after_hour_num >= 22 && after_minute_num > 0 )
         {
             after_hour_num = 22;
-            after_hour = "22";
             after_minute_num = 0;
-            after_minute = "00";
         }
 
         //시작시간 종료 시간 같은 경우는 skip
@@ -271,71 +273,51 @@ public class TimeTableActivity extends AppCompatActivity {
             int hour_subtract = (after_hour_num - before_hour_num) * 2;//시간 차이
             int minute_subtract = (after_minute_num - before_minute_num) / 30;//분 차이
 
-            int result = hour_subtract + minute_subtract;//span 해야될 row 개수
-            int row = (before_hour_num - 9) * 2 + (before_minute_num == 30 ?  2 : 1)   ;//행번호
+            int blocks = hour_subtract + minute_subtract;//span 해야될 row 개수
 
-
-            spanCells(before_hour, before_minute, day, before_hour_num, before_minute_num, result, row);
-
+            spanCells(before_hour+":"+before_minute, day, blocks, lecture);
         }
-        return before_hour;
+
     }
 
     //셀 병합
-    private void spanCells(String before_hour, String before_minute, String day, int before_hour_num, int before_minute_num, int result, int row) {
+    private void spanCells(String row, String column, int blocks, Lecture lecture)
+    {
+        timeTableLayout.addSchedule(lecture.lecture_code, row, column, blocks, getColor(R.color.mint));
+        timeTableLayout.findCell(row, column).setOnClickListener(view1 -> {
+            String code = ((TextView)view1).getText().toString();
 
-        deleteCellsBeforeSpan(day, before_hour_num, before_minute_num, result);
+            Observable.create(emitter -> {
+                emitter.onNext(viewModel.getLecture(code));
+            })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(o -> {
 
-        String IDofSpanCell = dayToEnglish(day) + before_hour + before_minute;//span해야할 cell의 id
+                        Lecture lecture1 = (Lecture) o;
 
-        TextView spanCell = (TextView) view.findViewWithTag(IDofSpanCell);//span cell
+                        View dialogView = getLayoutInflater().inflate(R.layout.lecture_dialog, null);
 
-        GridLayout.LayoutParams layoutParams = (GridLayout.LayoutParams)spanCell.getLayoutParams();
-        layoutParams.columnSpec = GridLayout.spec(dayToNum(day));
-        layoutParams.rowSpec = GridLayout.spec(row,result);//병합할 셀 수 정함
+                        TextView name = dialogView.findViewById(R.id.name);
+                        name.setText(lecture1.lecture_name);
 
-        spanCell.setLayoutParams(layoutParams);//적용
+                        TextView prof = dialogView.findViewById(R.id.professor);
+                        prof.setText(lecture1.professor);
 
-        layoutParams.setGravity(Gravity.FILL);//gravity 설정
+                        TextView room = dialogView.findViewById(R.id.room);
+                        room.setText(lecture1.lecture_room);
 
-        spanCell.setLayoutParams(layoutParams);//다시 적용
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setView(dialogView);
+                        builder.setTitle(code).setMessage("강의 정보");
+                        builder.setNegativeButton("확인", null);
 
-        spanCell.setText("     ");//빈 텍스트 적용
-        /* TODO :기기마다 버그 발생할 확률 높음!!!!!! */
-
-        spanCell.setBackground(getResources().getDrawable(R.drawable.fill_cell));
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+                    });
+        });
     }
 
-    //병합된 셀들 제거 작업 result수만큼 제거
-    private void deleteCellsBeforeSpan(String day, int before_hour_num, int before_minute_num, int result) {
-
-      /*  for(int j = 0;j < result - 1; j++)
-        {
-            String delete_cell_hour = before_minute_num == 30 ? ( before_hour_num + 1 < 10 ? "0" + String.valueOf(before_hour_num + 1) : String.valueOf(before_hour_num + 1)) : (before_hour_num < 10 ? "0" + String.valueOf(before_hour_num) : String.valueOf(before_hour_num) );
-            before_hour_num = before_minute_num == 30 ? before_hour_num + 1 : before_hour_num;
-
-            String delete_cell_minute = before_minute_num == 30 ? "00" : "30";
-            before_minute_num = before_minute_num == 30 ? 0 : 30;
-
-            String delete_cell_name = dayToEnglish(day)+delete_cell_hour+delete_cell_minute;
-            TextView deleteCell = (TextView) view.findViewWithTag(delete_cell_name);
-
-            GridLayout gridLayout2 = (GridLayout)view.findViewById(R.id.gridlayout_timetable);
-            gridLayout2.removeView(deleteCell);
-        }*/
-    }
-/*
-    private void setPossibleBtn() {
-        //가능여부 색깔 표시 버튼
-        isPossible_button = (Button)findViewById(R.id.isPossibleButton_timetable);
-
-        //버튼 색깔 판정
-        if(classification(classroom))//이용가능시 초록색
-            isPossible_button.setBackgroundColor(Color.GREEN);
-        else//이용불가시 빨간색
-            isPossible_button.setBackgroundColor(Color.RED);
-    }
-*/
     public int dayToNum(String day)
     {
         if (day.equals("월"))
@@ -355,140 +337,6 @@ public class TimeTableActivity extends AppCompatActivity {
         else
             return 0;
     }
-
-    //현재 시간 기준 이용가능 여부 판단
- /*   public boolean classification(String lectureRoom) {
-
-        boolean isPossible = true;
-
-        try {
-            isPossible = new AsyncTask<Void, Void, Boolean>()
-            {
-
-                @Override
-                protected Boolean doInBackground(Void... voids) {
-                    Cursor c = databaseLibrary.selectLectureRoomList(lectureRoom);
-
-        현재 시간 불러오기
-
-                    boolean isPossible = true;
-
-                    TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
-                    Calendar now = Calendar.getInstance(timeZone);
-
-                    String day1=dayToKorean(now.get(Calendar.DAY_OF_WEEK));
-
-                    String hour=String.valueOf(now.get(Calendar.HOUR_OF_DAY));
-
-                    String minute=String.valueOf(now.get(Calendar.MINUTE));
-                    System.out.println("현재시각 : "+day1+hour+":"+minute);
-
-                    String day_today = day1;//현재요일
-                    String hour_today = hour;//현재시간
-                    String minute_today = minute;//현재분
-
-                    while (c.moveToNext())
-                    {   //지정된 classroom 에 왔다고 가정
-
-                        String classroom = c.getString(0);
-                        String time = c.getString(1);
-
-                        StringTokenizer tokens = new StringTokenizer(time, " ");
-                        String[] times = new String[tokens.countTokens()];
-
-                        String before_hour = "", before_minute = "";
-                        String day = "";
-                        String after_hour = "", after_minute = "";
-
-                        for (int i = 0; i < times.length; i++)
-                        {
-                            if (i == 0)
-                            {
-                                times[i] = tokens.nextToken();//ex)화16:00
-
-                                day = times[i].substring(0, 1);
-                                before_hour = times[i].substring(1, 3);
-                                before_minute = times[i].substring(4, 6);
-                            }
-                            else if (i % 3 == 0)//새로운 시간대 beforetime이랑 요일구하기
-                            {
-                                times[i] = tokens.nextToken();//ex)화16:00
-
-                                day = times[i].substring(0, 1);
-                                before_hour = times[i].substring(1, 3);
-                                before_minute = times[i].substring(4, 6);
-                            }
-                            else if (i % 3 == 2)//aftertime 구하기
-                            {
-                                times[i] = tokens.nextToken();// ex)16:00
-                                after_hour = times[i].substring(0, 2);
-                                after_minute = times[i].substring(3, 5);
-                                System.out.println("aftertime : " + after_hour + " : " + after_minute);
-
-                                //숫자로변경
-                                int before_hour_num = Integer.parseInt(before_hour);
-                                int hour_today_num = Integer.parseInt(hour_today);
-                                int after_hour_num = Integer.parseInt(after_hour);
-                                int before_minute_num = Integer.parseInt(before_minute);
-                                int minute_today_num = Integer.parseInt(minute_today);
-                                int after_minute_num = Integer.parseInt(after_minute);
-
-                                //현재 강의실 이용가능 한지 구분 시작
-                                if (day.equals(day_today))
-                                {
-                                    //요일이 같으면 그다음 단계
-                                    if (before_hour_num < hour_today_num && hour_today_num < after_hour_num)//현재시간이 사이에 있다면 이용 불가
-                                        isPossible = false;
-                                    else if (before_hour_num > hour_today_num && hour_today_num > after_hour_num)//현재시간이 밖에 있다면 이용가능
-                                        isPossible = true;
-                                    else if (before_hour_num == hour_today_num)//before 시간과 같은 경우
-                                    {
-                                        //before 분과 비교
-                                        if (before_minute_num <= minute_today_num)//before minute보다 같거나 크면 이용불가
-                                            isPossible = false;
-                                            //작다면 이용가능
-                                        else
-                                            isPossible = true;
-
-                                    }
-                                    else if (after_hour_num == hour_today_num)//after 시간과 같은 경우
-                                    {
-                                        if (after_minute_num >= minute_today_num)//after minute보다 같거나 작으면 이용불가
-                                            isPossible = false;
-                                        else//크다면 이용가능
-                                            isPossible = true;
-                                    }
-                                }
-                                else//요일다르면 그냥 다음단계로 넘어감
-                                    isPossible = true;
-                            }
-                            else if (i % 3 == 1)
-                            {//~
-                                times[i] = tokens.nextToken();
-                            }
-
-                            //하나라도 이용불가라면 종료
-                            if (isPossible == false)
-                            {
-                                c.close();
-                                return isPossible;
-                            }
-                        }
-                    }
-                    c.close();
-
-                    return isPossible;
-                }
-            }.execute().get();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-
-        return isPossible;
-    }*/
 
     public String dayToKorean(int day) {
 

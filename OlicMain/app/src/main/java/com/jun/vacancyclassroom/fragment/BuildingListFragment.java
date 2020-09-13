@@ -57,7 +57,6 @@ public class BuildingListFragment extends Fragment {
         adapter = new BuildingListAdapter(getActivity(), viewModel);
 
         viewModel.getBuildings().observe(getViewLifecycleOwner(), buildings -> {
-            Collections.sort(buildings);
             adapter.submitList(buildings);
         });
 
@@ -113,7 +112,6 @@ public class BuildingListFragment extends Fragment {
                 }
 
                 //리스트 업데이트
-                Collections.sort(list);
                 adapter.submitList(list);
             }
 

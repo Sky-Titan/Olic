@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.vacancyclassroom.R;
 import com.jun.vacancyclassroom.activity.LoadingActivity;
 import com.jun.vacancyclassroom.adapter.SearchLectureAdapter;
-import com.jun.vacancyclassroom.database.MyDBHelper;
+
 import com.jun.vacancyclassroom.database.MyDatabase;
 import com.jun.vacancyclassroom.model.Lecture;
 import com.jun.vacancyclassroom.model.SearchLecture;

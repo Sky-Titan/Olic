@@ -43,7 +43,6 @@
 
         <Button
             android:id="@+id/isPossibleButton_timetable"
-            android:background="@color/red"
             android:clickable="false"
             android:layout_weight="1"
             android:layout_width="0dp"

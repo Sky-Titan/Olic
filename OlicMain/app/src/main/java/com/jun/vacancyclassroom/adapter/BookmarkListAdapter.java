@@ -4,10 +4,12 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.vacancyclassroom.R;
@@ -18,9 +20,9 @@ import com.jun.vacancyclassroom.database.MyDatabase;
 import com.jun.vacancyclassroom.database.MyViewHolder;
 
 import com.jun.vacancyclassroom.model.BookMarkedRoom;
-import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -49,6 +51,12 @@ public class BookmarkListAdapter extends ListAdapter<BookMarkedRoom, MyViewHolde
         hour = now.get(Calendar.HOUR_OF_DAY);
         minute = now.get(Calendar.MINUTE);
         day = now.get(Calendar.DAY_OF_WEEK);
+    }
+
+    @Override
+    public void submitList(@Nullable List<BookMarkedRoom> list) {
+        Collections.sort(list);
+        super.submitList(list);
     }
 
     //시간 설정
@@ -104,11 +112,6 @@ public class BookmarkListAdapter extends ListAdapter<BookMarkedRoom, MyViewHolde
     //해당 교실이 현재 시간에 이용가능한지 판단
     private boolean classification(List<String> time_list, String lectureRoom, int day_n, int hour_n, int minute_n)
     {
-        boolean isPossible = true;
-
-        String day_today = dayToKorean(day_n);//현재요일
-        String hour_today = String.valueOf(hour_n);//현재시간
-        String minute_today =String.valueOf(minute_n);//현재분
 
         for(int k = 0;k < time_list.size();k++)
         {
@@ -135,50 +138,63 @@ public class BookmarkListAdapter extends ListAdapter<BookMarkedRoom, MyViewHolde
                     after_hour = times[i].substring(0, 2);
                     after_minute = times[i].substring(3, 5);
 
-                    //숫자로변경
-                    int before_hour_num = Integer.parseInt(before_hour);
-                    int hour_today_num = Integer.parseInt(hour_today);
-                    int after_hour_num = Integer.parseInt(after_hour);
-                    int before_minute_num = Integer.parseInt(before_minute);
-                    int minute_today_num = Integer.parseInt(minute_today);
-                    int after_minute_num = Integer.parseInt(after_minute);
-
-                    //현재 강의실 이용가능 한지 구분 시작
-                    //요일이 같으면 그다음 단계
-                    if (day.equals(day_today))
-                    {
-                        if (before_hour_num < hour_today_num && hour_today_num < after_hour_num)//현재시간이 사이에 있다면 이용불가
-                            isPossible = false;
-                        else if (before_hour_num > hour_today_num && hour_today_num > after_hour_num)//현재시간이 밖에 있다면 이용가능
-                            isPossible = true;
-                        else if (before_hour_num == hour_today_num)//before 시간과 같은 경우
-                        {
-                            //before 분과 비교
-                            if (before_minute_num <= minute_today_num)//before minute보다 같거나 크면 이용불가
-                                isPossible = false;
-                            //작다면 이용가능
-                            else
-                                isPossible = true;
-                        }
-                        else if (after_hour_num == hour_today_num)//after 시간과 같은 경우
-                        {
-                            if (after_minute_num >= minute_today_num)//after minute보다 같거나 작으면 이용불가
-                                isPossible = false;
-                            else
-                                isPossible = true;
-                        }
-                    }
-                    else//요일다르면 그냥 다음단계로 넘어감
-                        isPossible = true;
+                    if(!isUsable(before_hour, before_minute, after_hour, after_minute, day))
+                        return false;
                 }
 
-                if (isPossible == false)//하나라도 이용불가라면 종료
-                    return isPossible;
             }
         }
 
-        return isPossible;
+        return true;
+    }
 
+    //강의실 이용가능 여부 판단
+    private boolean isUsable(String before_hour, String before_minute, String after_hour, String after_minute, String day)
+    {
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+
+        Calendar before = Calendar.getInstance(timeZone);
+        before.set(Calendar.DAY_OF_WEEK, dayToNum(day));
+        before.set(Calendar.HOUR_OF_DAY, Integer.parseInt(before_hour));
+        before.set(Calendar.MINUTE, Integer.parseInt(before_minute));
+       // Log.d(TAG, "BEFORE : "+before.get(Calendar.DATE)+" "+dayToKorean(before.get(Calendar.DAY_OF_WEEK))+ " "+before.get(Calendar.HOUR_OF_DAY)+" "+before.get(Calendar.MINUTE));
+
+        Calendar after = Calendar.getInstance(timeZone);
+        after.set(Calendar.DAY_OF_WEEK, dayToNum(day));
+        after.set(Calendar.HOUR_OF_DAY, Integer.parseInt(after_hour));
+        after.set(Calendar.MINUTE, Integer.parseInt(after_minute));
+       // Log.d(TAG, "AFTER : "+dayToKorean(after.get(Calendar.DAY_OF_WEEK))+ " "+after.get(Calendar.HOUR_OF_DAY)+" "+after.get(Calendar.MINUTE));
+
+        Calendar now = Calendar.getInstance(timeZone);
+        now.set(Calendar.DAY_OF_WEEK, this.day);
+        now.set(Calendar.HOUR_OF_DAY, this.hour);
+        now.set(Calendar.MINUTE, this.minute);
+
+       // Log.d(TAG, "NOW : "+now.get(Calendar.DATE)+" "+dayToKorean(now.get(Calendar.DAY_OF_WEEK))+ " "+now.get(Calendar.HOUR_OF_DAY)+" "+now.get(Calendar.MINUTE));
+
+        if( before.compareTo(now) <= 0 && after.compareTo(now) >= 0)
+            return false;
+        return true;
+    }
+
+    public int dayToNum(String day)
+    {
+        if (day.equals("월"))
+            return 1;
+        else if (day.equals("화"))
+            return 2;
+        else if (day.equals("수"))
+            return 3;
+        else if (day.equals("목"))
+            return 4;
+        else if (day.equals("금"))
+            return 5;
+        else if (day.equals("토"))
+            return 6;
+        else if (day.equals("일"))
+            return 7;
+        else
+            return 0;
     }
 
     public String dayToKorean(int day) {

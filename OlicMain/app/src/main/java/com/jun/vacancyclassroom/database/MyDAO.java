@@ -21,6 +21,9 @@ public interface MyDAO {
     @Query("SELECT * FROM Lecture")
     public LiveData<List<Lecture>> selectAllLectures();
 
+    @Query("SELECT * FROM Lecture WHERE lecture_code = :code")
+    public Lecture selectLecture(String code);
+
     @Query("SELECT * FROM LectureRoom")
     public LiveData<List<LectureRoom>> selectAllLectureRooms();
 
@@ -41,6 +44,9 @@ public interface MyDAO {
 
     @Query("SELECT DISTINCT lecture_time FROM Lecture WHERE lecture_room = :lecture_room")
     public List<String> selectAllLectureTimesIn(String lecture_room);
+
+    @Query("SELECT DISTINCT * FROM Lecture WHERE lecture_room = :lecture_room")
+    public List<Lecture> selectAllLectureIn(String lecture_room);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertLecture(Lecture lecture);

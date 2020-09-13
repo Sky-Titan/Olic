@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/blue</item>
 
         <!-- No title bar-->
         <item name="windowActionBar">false</item>
@@ -16,7 +16,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/skyblue</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/blue</item>
         <item name="android:statusBarColor">@color/statusBar_color</item>
 
     </style>

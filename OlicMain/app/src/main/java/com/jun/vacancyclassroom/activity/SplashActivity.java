@@ -13,13 +13,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.RoomDatabase;
 
 import com.example.vacancyclassroom.R;
-import com.jun.vacancyclassroom.database.DatabaseLibrary;
 import com.jun.vacancyclassroom.Myapplication;
-import com.jun.vacancyclassroom.database.MyDAO;
-import com.jun.vacancyclassroom.database.MyDatabase;
 
 import java.util.Calendar;
 import java.util.TimeZone;

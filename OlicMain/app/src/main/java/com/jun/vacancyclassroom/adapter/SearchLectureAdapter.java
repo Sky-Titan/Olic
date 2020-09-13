@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.vacancyclassroom.R;
@@ -24,6 +25,8 @@ import com.jun.vacancyclassroom.model.SearchLecture;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SearchLectureAdapter extends ListAdapter<Lecture, MyViewHolder<LecturesearchItemBinding>> {
 
@@ -35,6 +38,12 @@ public class SearchLectureAdapter extends ListAdapter<Lecture, MyViewHolder<Lect
         super(Lecture.DIFF_CALLBACK);
         this.viewModel = viewModel;
         this.context = context;
+    }
+
+    @Override
+    public void submitList(@Nullable List<Lecture> list) {
+        Collections.sort(list);
+        super.submitList(list);
     }
 
     @NonNull

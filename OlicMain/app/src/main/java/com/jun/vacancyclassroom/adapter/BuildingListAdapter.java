@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.vacancyclassroom.R;
@@ -17,6 +18,8 @@ import com.jun.vacancyclassroom.database.MyViewHolder;
 import com.jun.vacancyclassroom.model.Building;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,6 +41,12 @@ public class BuildingListAdapter extends ListAdapter<Building, MyViewHolder<Buil
         dao = MyDatabase.getInstance(context).dao();
 
         executorService = Executors.newSingleThreadExecutor();
+    }
+
+    @Override
+    public void submitList(@Nullable List<Building> list) {
+        Collections.sort(list);
+        super.submitList(list);
     }
 
     @NonNull
