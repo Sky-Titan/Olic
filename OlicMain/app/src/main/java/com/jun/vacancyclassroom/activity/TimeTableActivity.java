@@ -311,19 +311,19 @@ public class TimeTableActivity extends AppCompatActivity {
 
     public int dayToNum(String day)
     {
-        if (day.equals("월"))
+        if (day.equals("일"))
             return 1;
-        else if (day.equals("화"))
+        else if (day.equals("월"))
             return 2;
-        else if (day.equals("수"))
+        else if (day.equals("화"))
             return 3;
-        else if (day.equals("목"))
+        else if (day.equals("수"))
             return 4;
-        else if (day.equals("금"))
+        else if (day.equals("목"))
             return 5;
-        else if (day.equals("토"))
+        else if (day.equals("금"))
             return 6;
-        else if (day.equals("일"))
+        else if (day.equals("토"))
             return 7;
         else
             return 0;

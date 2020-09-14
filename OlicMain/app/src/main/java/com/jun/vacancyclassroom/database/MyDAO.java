@@ -48,13 +48,13 @@ public interface MyDAO {
     public List<Lecture> selectAllLectureIn(String lecture_room);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertLecture(Lecture lecture);
+    public void insertLecture(Lecture lecture) throws IllegalStateException;
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public void insertBuilding(Building building);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public void insertBuilding(Building building) throws IllegalStateException;
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public void insertLectureRoom(LectureRoom lectureRoom);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public void insertLectureRoom(LectureRoom lectureRoom) throws IllegalStateException;
 
     @Query("UPDATE LectureRoom SET isBookMarked = 1 WHERE lecture_room = :lectureRoom")
     public void unBookMarkRoom(String lectureRoom);

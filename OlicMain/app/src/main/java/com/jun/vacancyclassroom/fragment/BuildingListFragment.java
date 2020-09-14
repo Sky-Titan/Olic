@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.adapter.BuildingListAdapter;
 import com.jun.vacancyclassroom.model.Building;
+import com.jun.vacancyclassroom.model.LectureRoom;
 import com.jun.vacancyclassroom.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class BuildingListFragment extends Fragment {
 
     private static final String TAG = "BuildingListFragment";
 
+    private String searchWord = "";
 
     public BuildingListFragment() {
 
@@ -56,9 +59,7 @@ public class BuildingListFragment extends Fragment {
         viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
         adapter = new BuildingListAdapter(getActivity(), viewModel);
 
-        viewModel.getBuildings().observe(getViewLifecycleOwner(), buildings -> {
-            adapter.submitList(buildings);
-        });
+        renewal();
 
         //구분선 적용
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
@@ -88,37 +89,37 @@ public class BuildingListFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable arg0) {
                 // 입력이 끝났을 때
-                String searchWord = arg0.toString();
+                searchWord = arg0.toString();
 
-                List<Building> list = new ArrayList<>();
-
-                //검색어 없으면 전체 포함
-                if(searchWord.isEmpty())
-                {
-                    viewModel.getBuildings().observe(getViewLifecycleOwner(), buildings -> {
-                        list.addAll(buildings);
-                    });
-
-                }
-                else
-                {
-                    viewModel.getBuildings().observe(getViewLifecycleOwner(), buildings -> {
-                        for(int i = 0;i < buildings.size();i++)
-                        {
-                            if(buildings.get(i).buildingName.toLowerCase().contains(searchWord.toLowerCase()))
-                                list.add(buildings.get(i));
-                        }
-                    });
-                }
-
-                //리스트 업데이트
-                adapter.submitList(list);
+                renewal();
             }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // 입력하기 전에
             }
+        });
+    }
+
+    private void renewal()
+    {
+        viewModel.getBuildings().observe(getViewLifecycleOwner(), buildings -> {
+            List<Building> list = new ArrayList<>();
+
+            if(searchWord.isEmpty())
+                list.addAll(buildings);
+            else
+            {
+                for(int i = 0;i < buildings.size();i++)
+                {
+                    if(buildings.get(i).buildingName.toLowerCase().contains(searchWord.toLowerCase()))
+                        list.add(buildings.get(i));
+                }
+            }
+
+            Collections.sort(list);
+            //리스트 업데이트
+            adapter.submitList(list);
         });
     }
 

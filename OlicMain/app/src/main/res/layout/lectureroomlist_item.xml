@@ -6,8 +6,9 @@
             type="com.jun.vacancyclassroom.model.LectureRoom" />
     </data>
 
-    <com.jun.vacancyclassroom.model.CheckableLinearLayout
+    <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        android:background="?attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:descendantFocusability="blocksDescendants"
@@ -33,5 +34,5 @@
             android:gravity="center"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
-    </com.jun.vacancyclassroom.model.CheckableLinearLayout>
+    </LinearLayout>
 </layout>

@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,9 @@ public class LectureRoomListFragment extends Fragment {
 
     private static MainViewModel viewModel;
     private FragmentLectureroomlistBinding binding;
+    private String searchWord = "";
 
+    private static final String TAG = "LectureRoomListFragment";
 
 
     public LectureRoomListFragment() {
@@ -62,11 +65,7 @@ public class LectureRoomListFragment extends Fragment {
         adapter = new LectureRoomListAdapter(getActivity().getApplication(), viewModel);
 
         //강의실 데이터 변할때마다 호출
-        viewModel.getLectureRooms().observe(getViewLifecycleOwner(), lecturerooms -> {
-            ArrayList<LectureRoom> list = new ArrayList<>(lecturerooms);
-            Collections.sort(list);
-            adapter.submitList(list);
-        });
+        renewal();
 
 
         //구분선 적용
@@ -95,38 +94,41 @@ public class LectureRoomListFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable arg0) {
                 // 입력이 끝났을 때
-                String searchWord = arg0.toString();
+                searchWord = arg0.toString();
 
-                List<LectureRoom> list = new ArrayList<>();
-
-                //검색어 없으면 전체 포함
-                if(searchWord.isEmpty())
-                {
-                    viewModel.getLectureRooms().observe(getViewLifecycleOwner(), lectureRooms -> {
-                        list.addAll(lectureRooms);
-                    });
-
-                }
-                else
-                {
-                    viewModel.getLectureRooms().observe(getViewLifecycleOwner(), lectureRooms -> {
-                        for(int i = 0;i < lectureRooms.size();i++)
-                        {
-                            if(lectureRooms.get(i).lecture_room.toLowerCase().contains(searchWord.toLowerCase()))
-                                list.add(lectureRooms.get(i));
-                        }
-                    });
-                }
-
-                Collections.sort(list);
-                //리스트 업데이트
-                adapter.submitList(list);
+                renewal();
             }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // 입력하기 전에
             }
+        });
+    }
+
+    private void renewal()
+    {
+        //검색어 없으면 전체 포함
+        viewModel.getLectureRooms().observe(getViewLifecycleOwner(), lectureRooms -> {
+
+            List<LectureRoom> list = new ArrayList<>();
+            list.clear();
+            if(searchWord.isEmpty())
+            {
+                list.addAll(lectureRooms);
+            }
+            else {
+                for(int i = 0;i < lectureRooms.size();i++)
+                {
+                    if(lectureRooms.get(i).lecture_room.toLowerCase().contains(searchWord.toLowerCase()))
+                        list.add(lectureRooms.get(i));
+                }
+            }
+            Log.d(TAG, "lecturerooms 사이즈 : "+lectureRooms.size());
+            Log.d(TAG, "리스트 사이즈 : "+list.size());
+            Collections.sort(list);
+            //리스트 업데이트
+            adapter.submitList(list);
         });
     }
 

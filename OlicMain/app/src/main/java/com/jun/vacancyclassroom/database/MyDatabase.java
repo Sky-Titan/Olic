@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-@Database(version = 2, entities = {Lecture.class, LectureRoom.class, Building.class, SearchLecture.class})
+@Database(version = 1, entities = {Lecture.class, LectureRoom.class, Building.class, SearchLecture.class})
 public abstract class MyDatabase extends RoomDatabase {
 
     public abstract MyDAO dao();
@@ -84,7 +84,7 @@ public abstract class MyDatabase extends RoomDatabase {
 
     //실행
     @WorkerThread
-    public boolean doUpdate(int year, String semester, UpdateCallback callback)
+    public boolean doUpdate(int year, String semester, UpdateCallback callback) throws IOException, IllegalStateException
     {
         this.semester = year+semester;
 
@@ -95,8 +95,7 @@ public abstract class MyDatabase extends RoomDatabase {
         else//계절학기
             add_url2();
 
-        try
-        {
+
             for(int i=0;i<url_List.size();i++) {//url 리스트 만큼 반복
                 Document doc = Jsoup.connect(url_List.get(i)).get();
 
@@ -115,27 +114,24 @@ public abstract class MyDatabase extends RoomDatabase {
 
                 for (int j = 0; j < lectureCode.size(); j++)
                 {
-                    dao().insertLecture(new Lecture(lectureCode.get(j).text().trim(), lectureName.get(j).text().trim()
-                            ,lectureCredit.get(j).text().trim(), professor.get(j).text().trim(), quota.get(j).text().trim(),
-                            peopleNumber.get(j).text().trim(),lectureRoom.get(j).text().trim() , lectureTime.get(j).text().trim()));
+                    if(!lectureRoom.get(j).text().trim().isEmpty() && !lectureRoom.get(j).text().trim().equals("-"))
+                    {
+                        dao().insertLecture(new Lecture(lectureCode.get(j).text().trim(), lectureName.get(j).text().trim()
+                                ,lectureCredit.get(j).text().trim(), professor.get(j).text().trim(), quota.get(j).text().trim(),
+                                peopleNumber.get(j).text().trim(),lectureRoom.get(j).text().trim() , lectureTime.get(j).text().trim()));
 
-                    dao().insertLectureRoom(new LectureRoom(lectureRoom.get(j).text().trim()));
+                        dao().insertLectureRoom(new LectureRoom(lectureRoom.get(j).text().trim()));
 
-                    StringTokenizer strtok = new StringTokenizer(lectureRoom.get(j).text().trim(), "-");
+                        StringTokenizer strtok = new StringTokenizer(lectureRoom.get(j).text().trim(), "-");
 
-                    if(strtok.hasMoreTokens())
-                        dao().insertBuilding(new Building(strtok.nextToken()));
+                        if(strtok.hasMoreTokens())
+                            dao().insertBuilding(new Building(strtok.nextToken()));
+                    }
                 }
             }
 
             return true;
 
-        }
-        catch (IOException e) {
-
-            e.printStackTrace();
-            return false;
-        }
     }
 
     //계절학기 링크

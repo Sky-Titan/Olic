@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -156,20 +157,20 @@ public class BookmarkListAdapter extends ListAdapter<LectureRoom, MyViewHolder<B
         before.set(Calendar.DAY_OF_WEEK, dayToNum(day));
         before.set(Calendar.HOUR_OF_DAY, Integer.parseInt(before_hour));
         before.set(Calendar.MINUTE, Integer.parseInt(before_minute));
-       // Log.d(TAG, "BEFORE : "+before.get(Calendar.DATE)+" "+dayToKorean(before.get(Calendar.DAY_OF_WEEK))+ " "+before.get(Calendar.HOUR_OF_DAY)+" "+before.get(Calendar.MINUTE));
+        Log.d(TAG, "BEFORE : "+before.get(Calendar.DATE)+" "+dayToKorean(before.get(Calendar.DAY_OF_WEEK))+ " "+before.get(Calendar.HOUR_OF_DAY)+" "+before.get(Calendar.MINUTE));
 
         Calendar after = Calendar.getInstance(timeZone);
         after.set(Calendar.DAY_OF_WEEK, dayToNum(day));
         after.set(Calendar.HOUR_OF_DAY, Integer.parseInt(after_hour));
         after.set(Calendar.MINUTE, Integer.parseInt(after_minute));
-       // Log.d(TAG, "AFTER : "+dayToKorean(after.get(Calendar.DAY_OF_WEEK))+ " "+after.get(Calendar.HOUR_OF_DAY)+" "+after.get(Calendar.MINUTE));
+        Log.d(TAG, "AFTER : "+dayToKorean(after.get(Calendar.DAY_OF_WEEK))+ " "+after.get(Calendar.HOUR_OF_DAY)+" "+after.get(Calendar.MINUTE));
 
         Calendar now = Calendar.getInstance(timeZone);
         now.set(Calendar.DAY_OF_WEEK, this.day);
         now.set(Calendar.HOUR_OF_DAY, this.hour);
         now.set(Calendar.MINUTE, this.minute);
 
-       // Log.d(TAG, "NOW : "+now.get(Calendar.DATE)+" "+dayToKorean(now.get(Calendar.DAY_OF_WEEK))+ " "+now.get(Calendar.HOUR_OF_DAY)+" "+now.get(Calendar.MINUTE));
+        Log.d(TAG, "NOW : "+now.get(Calendar.DATE)+" "+dayToKorean(now.get(Calendar.DAY_OF_WEEK))+ " "+now.get(Calendar.HOUR_OF_DAY)+" "+now.get(Calendar.MINUTE));
 
         if( before.compareTo(now) <= 0 && after.compareTo(now) >= 0)
             return false;
@@ -178,19 +179,19 @@ public class BookmarkListAdapter extends ListAdapter<LectureRoom, MyViewHolder<B
 
     public int dayToNum(String day)
     {
-        if (day.equals("월"))
+        if (day.equals("일"))
             return 1;
-        else if (day.equals("화"))
+        else if (day.equals("월"))
             return 2;
-        else if (day.equals("수"))
+        else if (day.equals("화"))
             return 3;
-        else if (day.equals("목"))
+        else if (day.equals("수"))
             return 4;
-        else if (day.equals("금"))
+        else if (day.equals("목"))
             return 5;
-        else if (day.equals("토"))
+        else if (day.equals("금"))
             return 6;
-        else if (day.equals("일"))
+        else if (day.equals("토"))
             return 7;
         else
             return 0;
