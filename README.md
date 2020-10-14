@@ -1,5 +1,5 @@
 # Olic
-경북대학교 빈 강의실 찾기 애플리케이션
+*경북대학교 빈 강의실 찾기 애플리케이션*
 > Kyungpook National University Empty Classroom Finding Application 
 
 <img src=./img/olic_icon.png width="250">
