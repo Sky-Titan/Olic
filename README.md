@@ -47,7 +47,9 @@
 ### 3. 건물 검색
 - 건물별로 강의실들을 확인할 수 있습니다.
 - 예를 들어 IT융복합관의 강의실들을 전부 확인하고 싶다면 IT융복합관을 검색하여서 클릭하면 IT융복합관의 모든 강의실의 수업 여부를 확인할 수 있습니다.  
-<img src=./img/3_mockup.png width="500"><img src=./img/time_table_mockup.png width="500">  
+
+<img src=./img/3_mockup.png width="500">  
+<img src=./img/time_table_mockup.png width="500">  
   
 ### 4. 수강현황
 - 수강신청 기간에 수강신청에 실패했을 경우, 본인이 원하는 강의의 수강인원이 빠지는 것을 확인하기 위해 만든 기능입니다.
