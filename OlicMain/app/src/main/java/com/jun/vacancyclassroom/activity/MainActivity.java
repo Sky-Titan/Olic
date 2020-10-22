@@ -68,8 +68,6 @@ public class MainActivity extends AppCompatActivity {
         Myapplication myapplication = (Myapplication)getApplication();
         setTitle(myapplication.getCurrentSemester());
 
-        MobileAds.initialize(this, "ca-app-pub-7245602797811817~6821353940");
-
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
