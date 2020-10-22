@@ -32,7 +32,6 @@ import java.util.List;
 public class BuildingListFragment extends Fragment {
 
     private BuildingListAdapter adapter;
-    private AdView mAdView;
 
     private View view;
     private EditText search_edittext;

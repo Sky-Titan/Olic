@@ -35,7 +35,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class TimeTableActivity extends AppCompatActivity {
 
-    private AdView mAdView;
+
     private Button bookmark_button;
     private Button isPossible_button;
 

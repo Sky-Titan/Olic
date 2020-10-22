@@ -33,7 +33,6 @@ import java.util.List;
 public class LectureRoomListFragment extends Fragment {
 
     private static LectureRoomListAdapter adapter;
-    private AdView mAdView;
 
     private View view;
     private EditText search_edittext;

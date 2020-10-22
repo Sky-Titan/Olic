@@ -20,7 +20,6 @@ public class BuildingActivity extends AppCompatActivity {
 
     private BookmarkListAdapter adapter;
     private RecyclerView recyclerView;
-    private AdView mAdView;
 
     private BuildingViewModel viewModel;
 

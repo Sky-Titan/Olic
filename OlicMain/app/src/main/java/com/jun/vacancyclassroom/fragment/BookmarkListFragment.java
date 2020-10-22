@@ -34,7 +34,6 @@ public class BookmarkListFragment extends Fragment {
 
     private BookmarkListAdapter adapter;
 
-    private AdView mAdView;
 
     private View view;
 
@@ -83,7 +82,6 @@ public class BookmarkListFragment extends Fragment {
 
         setVisibilityTime();
 
-        //setAdView();
 
         return view;
     }
@@ -158,11 +156,4 @@ public class BookmarkListFragment extends Fragment {
         return now;
     }
 
-  /*  private void setAdView() {
-        mAdView = view.findViewById(R.id.adView2);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        mAdView.loadAd(adRequest);
-    }*/
 }
