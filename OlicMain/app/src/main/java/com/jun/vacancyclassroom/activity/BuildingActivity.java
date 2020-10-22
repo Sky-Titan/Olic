@@ -41,11 +41,6 @@ public class BuildingActivity extends AppCompatActivity {
         buildingName_textview.setText(buildingName);
 
 
-        mAdView = findViewById(R.id.adView5);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        mAdView.loadAd(adRequest);
 
         recyclerView = findViewById(R.id.lectureBuilding_recyclerview);
         adapter = new BookmarkListAdapter(getApplication(), this);

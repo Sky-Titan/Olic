@@ -8,20 +8,6 @@
     tools:context="com.jun.vacancyclassroom.fragment.BookmarkListFragment">
 
 
-    <com.google.android.gms.ads.AdView
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/adView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        ads:layout_constraintStart_toStartOf="parent"
-        ads:layout_constraintEnd_toEndOf="parent"
-        ads:layout_constraintTop_toTopOf="parent"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        ads:adSize="BANNER"
-        android:layout_gravity="center_horizontal"
-        ads:adUnitId="ca-app-pub-7245602797811817/8402507853">
-    </com.google.android.gms.ads.AdView>
 
     <Button
         android:id="@+id/visible_btn"
@@ -29,7 +15,7 @@
         android:layout_gravity="right"
         android:background="@drawable/ripple_transparent"
         android:drawableRight="@drawable/ic_arrow_drop_up_black_36dp"
-        app:layout_constraintTop_toBottomOf="@id/adView2"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

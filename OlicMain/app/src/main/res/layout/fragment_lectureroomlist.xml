@@ -18,28 +18,13 @@
         tools:context="com.jun.vacancyclassroom.fragment.LectureRoomListFragment">
 
 
-        <com.google.android.gms.ads.AdView
-            xmlns:ads="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/adView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            ads:layout_constraintStart_toStartOf="parent"
-            ads:layout_constraintEnd_toEndOf="parent"
-            ads:layout_constraintTop_toTopOf="parent"
-            ads:layout_constraintBottom_toTopOf="@id/search_classroom"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            ads:adSize="BANNER"
-            android:layout_gravity="center_horizontal"
-            ads:adUnitId="ca-app-pub-7245602797811817/2163923634">
-        </com.google.android.gms.ads.AdView>
 
         <EditText
             android:id="@+id/search_classroom"
             android:textSize="20dp"
             android:layout_marginHorizontal="20dp"
             android:hint="강의실 검색"
-            app:layout_constraintTop_toBottomOf="@id/adView1"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/lecturelist_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

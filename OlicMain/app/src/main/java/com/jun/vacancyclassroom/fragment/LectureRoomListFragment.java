@@ -60,7 +60,7 @@ public class LectureRoomListFragment extends Fragment {
         binding.setLifecycleOwner(this);
         view = binding.getRoot();
 
-        setAdView();
+
 
         adapter = new LectureRoomListAdapter(getActivity().getApplication(), viewModel);
 
@@ -132,13 +132,6 @@ public class LectureRoomListFragment extends Fragment {
         });
     }
 
-    private void setAdView() {
-        mAdView = view.findViewById(R.id.adView1);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        mAdView.loadAd(adRequest);
-    }
 
 
 }

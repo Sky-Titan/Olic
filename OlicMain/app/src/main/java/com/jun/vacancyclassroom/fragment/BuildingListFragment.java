@@ -67,8 +67,6 @@ public class BuildingListFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
 
-        setAdView();
-
         search_edittext = (EditText)view.findViewById(R.id.search_building);
         setSearchEdit();
 
@@ -123,13 +121,5 @@ public class BuildingListFragment extends Fragment {
         });
     }
 
-
-    private void setAdView() {
-        mAdView = (AdView) view.findViewById(R.id.adView4);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        mAdView.loadAd(adRequest);
-    }
 
 }

@@ -70,8 +70,6 @@ public class TimeTableActivity extends AppCompatActivity {
         classroom_textview = findViewById(R.id.classroom_name_timetable);
         classroom_textview.setText(lectureRoom);
 
-        //애드뷰 설정
-        setAdView();
 
         //북마크 상태 설정
         bookmark_button = findViewById(R.id.bookmarkButton_timetable);
@@ -111,16 +109,6 @@ public class TimeTableActivity extends AppCompatActivity {
                 viewModel.removeBookMarkedRoom(lectureRoom);
         });
 
-    }
-
-
-    private void setAdView() {
-        //애드뷰 설정
-        mAdView = (AdView) findViewById(R.id.adView3);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        mAdView.loadAd(adRequest);
     }
 
     private void setTimeTable()
