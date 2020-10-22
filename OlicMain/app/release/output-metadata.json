@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "properties": [],
-      "versionCode": 28,
-      "versionName": "1.4.3",
+      "versionCode": 29,
+      "versionName": "1.4.4",
       "enabled": true,
       "outputFile": "app-release.apk"
     }
