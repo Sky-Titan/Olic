@@ -25,7 +25,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.vacancyclassroom.R;
-import com.google.android.gms.ads.MobileAds;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.jun.vacancyclassroom.database.MyDAO;
 import com.jun.vacancyclassroom.database.MyDatabase;

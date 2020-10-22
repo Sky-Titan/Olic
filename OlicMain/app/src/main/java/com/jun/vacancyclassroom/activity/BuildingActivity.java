@@ -10,8 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vacancyclassroom.R;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+
 import com.jun.vacancyclassroom.adapter.BookmarkListAdapter;
 import com.jun.vacancyclassroom.viewmodel.BuildingViewModel;
 import com.jun.vacancyclassroom.viewmodel.BuildingViewModelFactory;

@@ -17,8 +17,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.example.vacancyclassroom.R;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+
 import com.jun.vacancyclassroom.adapter.BuildingListAdapter;
 import com.jun.vacancyclassroom.model.Building;
 import com.jun.vacancyclassroom.model.LectureRoom;

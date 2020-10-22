@@ -15,8 +15,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.vacancyclassroom.R;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.jun.vacancyclassroom.Myapplication;
 import com.jun.vacancyclassroom.model.Lecture;
 import com.jun.vacancyclassroom.model.LectureRoom;
