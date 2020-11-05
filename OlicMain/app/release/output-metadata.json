@@ -1,19 +1,17 @@
 {
-  "version": 1,
+  "version": 2,
   "artifactType": {
     "type": "APK",
     "kind": "Directory"
   },
   "applicationId": "com.jun.vacancyclassroom",
-  "variantName": "release",
+  "variantName": "processReleaseResources",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
-      "properties": [],
-      "versionCode": 29,
-      "versionName": "1.4.4",
-      "enabled": true,
+      "versionCode": 30,
+      "versionName": "1.4.5",
       "outputFile": "app-release.apk"
     }
   ]

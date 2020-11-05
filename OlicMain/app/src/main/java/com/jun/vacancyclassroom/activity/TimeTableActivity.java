@@ -44,6 +44,9 @@ public class TimeTableActivity extends AppCompatActivity {
     private CollegeTimeTableLayout timeTableLayout;
 
     private TimeTableViewModel viewModel;
+
+    private Myapplication myapplication;
+
     private static final String TAG = "TimeTableActivity";
 
     @Override
@@ -51,7 +54,7 @@ public class TimeTableActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         view = getLayoutInflater().from(this).inflate(R.layout.activity_time_table,null);
 
-        Myapplication myapplication = (Myapplication)getApplication();
+        myapplication = (Myapplication)getApplication();
         setTitle(myapplication.getCurrentSemester());
         setContentView(view);
 
@@ -168,7 +171,7 @@ public class TimeTableActivity extends AppCompatActivity {
 
                         for (int i = 0; i < times.length; i++)
                         {
-                            if (i % 3 == 0)//새로운 시간대 beforetime(시작시간)이랑 요일구하기
+                            if (times[i].length() == 6)//새로운 시간대 beforetime(시작시간)이랑 요일구하기
                             {
                                 //ex)화16:00
                                 //요일
@@ -178,7 +181,7 @@ public class TimeTableActivity extends AppCompatActivity {
                                 before_hour = times[i].substring(1, 3);
                                 before_minute = times[i].substring(4, 6);
                             }
-                            else if (i % 3 == 2)//aftertime 구하기 (종료시간)
+                            else if (times[i].length() == 5)//aftertime 구하기 (종료시간)
                             {
                                 // ex)16:00
                                 //종료시간

@@ -57,7 +57,7 @@ public interface MyDAO {
     public void insertLectureRoom(LectureRoom lectureRoom) throws IllegalStateException;
 
     @Query("UPDATE LectureRoom SET isBookMarked = 1 WHERE lecture_room = :lectureRoom")
-    public void unBookMarkRoom(String lectureRoom);
+    public void bookMarkRoom(String lectureRoom);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public void insertSearchLecture(SearchLecture searchlecture);
@@ -79,7 +79,7 @@ public interface MyDAO {
     public void deleteLecture(Lecture lecture);
 
     @Query("UPDATE LectureRoom SET isBookMarked = 0 WHERE lecture_room = :lectureRoom")
-    public void bookMarkRoom(String lectureRoom);
+    public void unBookMarkRoom(String lectureRoom);
 
     @Delete
     public void deleteSearchLecture(SearchLecture searchLecture);

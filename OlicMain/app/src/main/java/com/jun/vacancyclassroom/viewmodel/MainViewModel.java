@@ -92,13 +92,13 @@ public class MainViewModel extends ViewModel {
     //즐겨찾기 강의실 추가
     public void addBookMarkedRoom(String bookMarkedRoom)
     {
-        executorService.execute(() -> dao.unBookMarkRoom(bookMarkedRoom));
+        executorService.execute(() -> dao.bookMarkRoom(bookMarkedRoom));
     }
 
     //즐겨찾기 강의실 삭제
     public void removeBookMarkedRoom(String bookMarkedRoom)
     {
-        executorService.execute(() -> dao.bookMarkRoom(bookMarkedRoom));
+        executorService.execute(() -> dao.unBookMarkRoom(bookMarkedRoom));
     }
 
     public void deleteAllTables()
